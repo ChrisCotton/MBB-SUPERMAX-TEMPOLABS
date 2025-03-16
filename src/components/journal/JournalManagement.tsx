@@ -63,19 +63,37 @@ const JournalManagement = () => {
       const user = await getCurrentUser();
       if (!user) {
         console.error("Error creating journal entry: No authenticated user");
+        alert("You must be logged in to create a journal entry");
         return;
       }
 
-      // For audio, we would normally upload to storage and get a URL
-      // For this demo, we'll just store the blob URL directly
+      // For audio, we need to handle the blob URL differently
+      // Blob URLs can't be stored directly in the database as they're temporary and browser-specific
       // In a real app, you'd upload the audio file to Supabase storage
+      // For now, we'll just store a placeholder or null
+
+      // Check if audioUrl is a blob URL and handle accordingly
+      let audioUrlToStore = null;
+      if (entryData.audioUrl) {
+        // For demo purposes, store a placeholder instead of the blob URL
+        // In a real app, you would upload the audio file to storage here
+        audioUrlToStore = "audio-recording-placeholder";
+      }
+
+      console.log("Inserting journal entry with data:", {
+        title: entryData.title,
+        content: entryData.content,
+        audio_url: audioUrlToStore,
+        transcription: entryData.transcription || null,
+        user_id: user.id,
+      });
 
       const { data, error } = await supabase
         .from("journal_entries")
         .insert({
           title: entryData.title,
           content: entryData.content,
-          audio_url: entryData.audioUrl || null,
+          audio_url: audioUrlToStore,
           transcription: entryData.transcription || null,
           user_id: user.id,
         })
@@ -84,7 +102,9 @@ const JournalManagement = () => {
 
       if (error) {
         console.error("Supabase error creating journal entry:", error);
-        throw error;
+        throw new Error(
+          `Database error: ${error.message || error.code || JSON.stringify(error)}`,
+        );
       }
 
       if (!data) {
@@ -97,7 +117,7 @@ const JournalManagement = () => {
         id: data.id,
         title: data.title,
         content: data.content,
-        audioUrl: data.audio_url,
+        audioUrl: entryData.audioUrl, // Use the original audioUrl for frontend display
         transcription: data.transcription,
         createdAt: data.created_at,
         userId: data.user_id,
@@ -106,7 +126,11 @@ const JournalManagement = () => {
       setEntries([newEntry, ...entries]);
       setIsEntryDialogOpen(false);
     } catch (error) {
-      console.error("Error creating journal entry:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error creating journal entry:", error, errorMessage);
+      // Show a more descriptive error message
+      alert(`Failed to save journal entry: ${errorMessage}`);
     }
   };
 
@@ -120,26 +144,45 @@ const JournalManagement = () => {
     if (!currentEntry) return;
 
     try {
+      // Handle blob URLs for audio similar to createEntry
+      let audioUrlToStore = null;
+      if (entryData.audioUrl) {
+        // For demo purposes, store a placeholder instead of the blob URL
+        audioUrlToStore = "audio-recording-placeholder";
+      }
+
+      console.log("Updating journal entry with data:", {
+        title: entryData.title,
+        content: entryData.content,
+        audio_url: audioUrlToStore,
+        transcription: entryData.transcription || null,
+        id: currentEntry.id,
+      });
+
       const { data, error } = await supabase
         .from("journal_entries")
         .update({
           title: entryData.title,
           content: entryData.content,
-          audio_url: entryData.audioUrl || null,
+          audio_url: audioUrlToStore,
           transcription: entryData.transcription || null,
         })
         .eq("id", currentEntry.id)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        throw new Error(
+          `Database error: ${error.message || error.code || JSON.stringify(error)}`,
+        );
+      }
 
       // Map the database response to our frontend type
       const updatedEntry: JournalEntryType = {
         id: data.id,
         title: data.title,
         content: data.content,
-        audioUrl: data.audio_url,
+        audioUrl: entryData.audioUrl, // Use the original audioUrl for frontend display
         transcription: data.transcription,
         createdAt: data.created_at,
         userId: data.user_id,
@@ -154,7 +197,11 @@ const JournalManagement = () => {
       setCurrentEntry(null);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating journal entry:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error updating journal entry:", error, errorMessage);
+      // Show a more descriptive error message
+      alert(`Failed to update journal entry: ${errorMessage}`);
     }
   };
 

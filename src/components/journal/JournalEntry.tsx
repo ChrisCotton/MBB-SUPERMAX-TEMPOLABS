@@ -243,6 +243,12 @@ const JournalEntry = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setError(null);
+      console.log("Submitting journal entry:", {
+        title: values.title,
+        content: values.content,
+        audioUrl,
+        transcription,
+      });
       await onSave({
         title: values.title,
         content: values.content,
