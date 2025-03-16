@@ -61,7 +61,10 @@ const JournalManagement = () => {
   }) => {
     try {
       const user = await getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        console.error("Error creating journal entry: No authenticated user");
+        return;
+      }
 
       // For audio, we would normally upload to storage and get a URL
       // For this demo, we'll just store the blob URL directly
@@ -79,7 +82,15 @@ const JournalManagement = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error creating journal entry:", error);
+        throw error;
+      }
+
+      if (!data) {
+        console.error("No data returned from journal entry creation");
+        throw new Error("Failed to create journal entry - no data returned");
+      }
 
       // Map the database response to our frontend type
       const newEntry: JournalEntryType = {

@@ -240,13 +240,19 @@ const JournalEntry = ({
     };
   }, [isRecording]);
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    onSave({
-      title: values.title,
-      content: values.content,
-      audioUrl,
-      transcription,
-    });
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setError(null);
+      await onSave({
+        title: values.title,
+        content: values.content,
+        audioUrl,
+        transcription,
+      });
+    } catch (err) {
+      console.error("Error saving journal entry:", err);
+      setError("Failed to save journal entry. Please try again.");
+    }
   };
 
   return (
