@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Edit, Trash2, Play, Pause, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,6 +84,16 @@ const JournalList = ({
     return text.substring(0, maxLength) + "...";
   };
 
+  // Format date safely
+  const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "Date unavailable";
+
+    const date = new Date(dateString);
+    if (!isValid(date)) return "Date unavailable";
+
+    return format(date, "MMM d, yyyy h:mm a");
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
@@ -131,7 +141,7 @@ const JournalList = ({
                   <div>
                     <CardTitle className="text-lg">{entry.title}</CardTitle>
                     <CardDescription>
-                      {format(new Date(entry.createdAt), "MMM d, yyyy h:mm a")}
+                      {formatDate(entry.createdAt)}
                     </CardDescription>
                   </div>
                   <DropdownMenu>
