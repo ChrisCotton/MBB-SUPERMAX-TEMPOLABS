@@ -36,6 +36,115 @@ export type Database = {
         }
         Relationships: []
       }
+      goal_milestones: {
+        Row: {
+          completion_date: string | null
+          created_at: string
+          description: string | null
+          goal_id: string
+          id: string
+          is_completed: boolean | null
+          reward: string | null
+          target_value: number
+          title: string
+        }
+        Insert: {
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          goal_id: string
+          id?: string
+          is_completed?: boolean | null
+          reward?: string | null
+          target_value: number
+          title: string
+        }
+        Update: {
+          completion_date?: string | null
+          created_at?: string
+          description?: string | null
+          goal_id?: string
+          id?: string
+          is_completed?: boolean | null
+          reward?: string | null
+          target_value?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_milestones_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          current_value: number | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_completed: boolean | null
+          progress_percentage: number | null
+          reward: string | null
+          start_date: string
+          target_date: string
+          target_value: number
+          time_frame: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_completed?: boolean | null
+          progress_percentage?: number | null
+          reward?: string | null
+          start_date?: string
+          target_date: string
+          target_value: number
+          time_frame: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_completed?: boolean | null
+          progress_percentage?: number | null
+          reward?: string | null
+          start_date?: string
+          target_date?: string
+          target_value?: number
+          time_frame?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       journal_entries: {
         Row: {
           audio_url: string | null

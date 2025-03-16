@@ -50,3 +50,36 @@ export interface JournalEntryType {
   createdAt: string;
   userId: string;
 }
+
+export type TimeFrame = "weekly" | "monthly" | "biannual" | "annual";
+
+export interface Goal {
+  id: string;
+  title: string;
+  description: string;
+  targetValue: number;
+  currentValue: number;
+  progressPercentage: number;
+  startDate: string;
+  targetDate: string;
+  timeFrame: TimeFrame;
+  categoryId?: string;
+  isCompleted: boolean;
+  isActive: boolean;
+  reward?: string;
+  createdAt: string;
+  updatedAt: string;
+  milestones?: GoalMilestone[];
+}
+
+export interface GoalMilestone {
+  id: string;
+  goalId: string;
+  title: string;
+  description: string;
+  targetValue: number;
+  isCompleted: boolean;
+  completionDate?: string;
+  reward?: string;
+  createdAt: string;
+}
