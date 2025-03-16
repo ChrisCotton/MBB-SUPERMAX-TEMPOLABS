@@ -162,6 +162,7 @@ const JournalEntry = ({
         });
 
       if (aiTranscription) {
+        console.log("Transcription successful:", aiTranscription);
         setTranscription(aiTranscription);
 
         // Optionally update the content field with the transcription

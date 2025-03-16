@@ -78,6 +78,7 @@ const JournalManagement = () => {
         // For demo purposes, store a placeholder instead of the blob URL
         // In a real app, you would upload the audio file to storage here
         audioUrlToStore = "audio-recording-placeholder";
+        console.log("Audio URL detected and placeholder set");
       }
 
       console.log("Inserting journal entry with data:", {
@@ -88,6 +89,7 @@ const JournalManagement = () => {
         user_id: user.id,
       });
 
+      // Insert the journal entry
       const { data, error } = await supabase
         .from("journal_entries")
         .insert({
@@ -101,7 +103,7 @@ const JournalManagement = () => {
         .single();
 
       if (error) {
-        console.error("Supabase error creating journal entry:", error);
+        console.error("Database insertion error:", error);
         throw new Error(
           `Database error: ${error.message || error.code || JSON.stringify(error)}`,
         );
@@ -168,7 +170,7 @@ const JournalManagement = () => {
           transcription: entryData.transcription || null,
         })
         .eq("id", currentEntry.id)
-        .select()
+        .select("*")
         .single();
 
       if (error) {

@@ -289,7 +289,9 @@ const AISettings = () => {
                     </SelectContent>
                   </Select>
                   <FormDescription>
-                    Select the specific model to use for AI operations
+                    For text analysis, use models like gpt-4, gpt-3.5-turbo. For
+                    audio transcription, the system will automatically use
+                    whisper-1 regardless of this setting.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

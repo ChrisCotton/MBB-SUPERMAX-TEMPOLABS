@@ -104,8 +104,10 @@ export const transcribeAudio = async (
     if (config.provider === "openai") {
       const formData = new FormData();
       formData.append("file", audioBlob, "recording.webm");
-      formData.append("model", config.model || "whisper-1");
+      // Always use whisper-1 for audio transcription regardless of the model set in config
+      formData.append("model", "whisper-1");
 
+      // Use the correct endpoint for Whisper model
       const response = await fetch(
         "https://api.openai.com/v1/audio/transcriptions",
         {

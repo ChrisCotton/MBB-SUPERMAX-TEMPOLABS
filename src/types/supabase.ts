@@ -36,6 +36,36 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_entries: {
+        Row: {
+          audio_url: string | null
+          content: string
+          created_at: string | null
+          id: string
+          title: string
+          transcription: string | null
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          title: string
+          transcription?: string | null
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          title?: string
+          transcription?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mental_bank_balances: {
         Row: {
           created_at: string | null
