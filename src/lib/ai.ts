@@ -53,13 +53,37 @@ export const saveAIConfig = async (config: AIConfig): Promise<boolean> => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return false;
 
-    const { error } = await supabase.from("user_settings").upsert({
-      user_id: user.user.id,
-      ai_config: config,
-      updated_at: new Date().toISOString(),
-    });
+    // First check if a record already exists
+    const { data: existingSettings } = await supabase
+      .from("user_settings")
+      .select("id")
+      .eq("user_id", user.user.id)
+      .maybeSingle();
 
-    return !error;
+    let result;
+    if (existingSettings) {
+      // Update existing record
+      result = await supabase
+        .from("user_settings")
+        .update({
+          ai_config: config,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", user.user.id);
+    } else {
+      // Insert new record
+      result = await supabase.from("user_settings").insert({
+        user_id: user.user.id,
+        ai_config: config,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    if (result.error) {
+      console.error("Error saving AI config:", result.error);
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error("Error saving AI config:", error);
     return false;

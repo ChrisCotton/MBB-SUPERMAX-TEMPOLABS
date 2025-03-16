@@ -114,6 +114,7 @@ const AISettings = () => {
       case "openai":
         return [
           { value: "gpt-4", label: "GPT-4" },
+          { value: "gpt-4o", label: "GPT-4o" },
           { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
           { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
           { value: "whisper-1", label: "Whisper-1 (Audio)" },
