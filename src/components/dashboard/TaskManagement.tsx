@@ -496,6 +496,9 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
   const handleStartTimer = (task: Task) => {
     setTimerTask(task);
     setShowTimer(true);
+
+    // Make sure we don't mark the task as complete when starting the timer
+    // Just show the timer for the selected task
   };
 
   const handleTimeLogged = async (taskId: string, timeSpent: number) => {

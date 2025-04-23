@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Pause, StopCircle, Clock, Save } from "lucide-react";
+import { Play, Pause, StopCircle, Clock, Save, History } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Task } from "@/lib/types";
-import { updateTask } from "@/lib/storage";
+import { Task, TimeEntry } from "@/lib/types";
+import { timerService } from "@/lib/timerService";
 
 interface TaskTimerProps {
   task?: Task | null;
@@ -21,8 +21,8 @@ const TaskTimer = ({
   const [elapsedTime, setElapsedTime] = useState(0);
   const [savedTime, setSavedTime] = useState(0);
   const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const timerRef = useRef<number | null>(null);
-  const startTimeRef = useRef<number | null>(null);
 
   // Format time as HH:MM:SS
   const formatTime = (timeInSeconds: number) => {
@@ -37,36 +37,114 @@ const TaskTimer = ({
     ].join(":");
   };
 
-  // Start the timer
-  const startTimer = () => {
-    if (!isRunning) {
-      setIsRunning(true);
-      startTimeRef.current = Date.now() - elapsedTime * 1000;
-      timerRef.current = window.setInterval(() => {
-        if (startTimeRef.current) {
-          const elapsedSeconds = Math.floor(
-            (Date.now() - startTimeRef.current) / 1000,
-          );
-          setElapsedTime(elapsedSeconds);
+  // Load timer state from Supabase when task changes
+  useEffect(() => {
+    if (!task) return;
+
+    const loadTimerState = async () => {
+      try {
+        // Get the current timer state
+        const { isRunning: running, elapsedTime: elapsed } =
+          await timerService.getTimerState(task.id);
+        setIsRunning(running);
+        setElapsedTime(elapsed);
+
+        // Get time entries
+        const entries = await timerService.getTimeEntries(task.id);
+        setTimeEntries(entries);
+
+        // If the timer is running, start the interval
+        if (running) {
+          startTimerInterval();
         }
-      }, 1000);
+      } catch (error) {
+        console.error("Error loading timer state:", error);
+      }
+    };
+
+    loadTimerState();
+
+    // Clean up interval on unmount or when task changes
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [task?.id]);
+
+  // Start the timer interval to update the UI
+  const startTimerInterval = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    timerRef.current = window.setInterval(async () => {
+      if (task) {
+        const { elapsedTime: newElapsedTime } =
+          await timerService.getTimerState(task.id);
+        setElapsedTime(newElapsedTime);
+      }
+    }, 1000);
+  };
+
+  // Start the timer
+  const startTimer = async () => {
+    if (!task || isRunning) return;
+
+    try {
+      const success = await timerService.startTimer(task.id);
+      if (success) {
+        setIsRunning(true);
+        startTimerInterval();
+      }
+    } catch (error) {
+      console.error("Error starting timer:", error);
     }
   };
 
   // Pause the timer
-  const pauseTimer = () => {
-    if (isRunning && timerRef.current) {
-      setIsRunning(false);
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+  const pauseTimer = async () => {
+    if (!task || !isRunning) return;
+
+    try {
+      const success = await timerService.pauseTimer(task.id);
+      if (success) {
+        setIsRunning(false);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+
+        // Refresh time entries
+        const entries = await timerService.getTimeEntries(task.id);
+        setTimeEntries(entries);
+      }
+    } catch (error) {
+      console.error("Error pausing timer:", error);
     }
   };
 
   // Stop the timer and prompt to save
-  const stopTimer = () => {
-    pauseTimer();
-    if (elapsedTime > 0) {
-      setShowSavePrompt(true);
+  const stopTimer = async () => {
+    if (!task) return;
+
+    try {
+      const success = await timerService.stopTimer(task.id);
+      if (success) {
+        setIsRunning(false);
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        setShowSavePrompt(true);
+
+        // Refresh time entries
+        const entries = await timerService.getTimeEntries(task.id);
+        setTimeEntries(entries);
+      }
+    } catch (error) {
+      console.error("Error stopping timer:", error);
     }
   };
 
@@ -78,19 +156,20 @@ const TaskTimer = ({
       // Convert to hours for consistency with estimated hours
       const timeSpentHours = parseFloat((elapsedTime / 3600).toFixed(2));
 
-      // Update the task with the actual time spent
-      await updateTask(task.id, {
-        actualTimeSpent: (task.actualTimeSpent || 0) + timeSpentHours,
-      });
+      // Save the time to the task
+      const success = await timerService.saveTimeToTask(
+        task.id,
+        timeSpentHours,
+      );
+      if (success) {
+        // Notify parent component
+        onTimeLogged(task.id, timeSpentHours);
 
-      // Notify parent component
-      onTimeLogged(task.id, timeSpentHours);
-
-      // Reset timer state
-      setSavedTime(savedTime + elapsedTime);
-      setElapsedTime(0);
-      setShowSavePrompt(false);
-      startTimeRef.current = null;
+        // Reset timer state
+        setSavedTime(elapsedTime);
+        setElapsedTime(0);
+        setShowSavePrompt(false);
+      }
     } catch (error) {
       console.error("Error saving time:", error);
     }
@@ -98,9 +177,7 @@ const TaskTimer = ({
 
   // Discard the current timer session
   const discardTime = () => {
-    setElapsedTime(0);
     setShowSavePrompt(false);
-    startTimeRef.current = null;
   };
 
   // Clean up interval on unmount
@@ -111,19 +188,6 @@ const TaskTimer = ({
       }
     };
   }, []);
-
-  // Reset timer when task changes
-  useEffect(() => {
-    setElapsedTime(0);
-    setSavedTime(0);
-    setIsRunning(false);
-    setShowSavePrompt(false);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    startTimeRef.current = null;
-  }, [task?.id]);
 
   if (!task) {
     return (
@@ -152,7 +216,11 @@ const TaskTimer = ({
             </p>
           </div>
           <Badge variant="outline" className="ml-2">
-            {task.completed ? "Completed" : "In Progress"}
+            {task.completed
+              ? "Completed"
+              : task.inProgress
+                ? "Timing"
+                : "In Progress"}
           </Badge>
         </div>
       </CardHeader>
@@ -227,6 +295,35 @@ const TaskTimer = ({
               <p className="text-green-700">
                 {formatTime(savedTime)} saved to this task
               </p>
+            </div>
+          )}
+
+          {timeEntries.length > 0 && (
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <History className="h-4 w-4 text-muted-foreground" />
+                <h4 className="text-sm font-medium">Recent Time Entries</h4>
+              </div>
+              <div className="text-xs space-y-1 max-h-32 overflow-y-auto">
+                {timeEntries.slice(0, 5).map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="flex justify-between p-2 bg-muted/30 rounded"
+                  >
+                    <span>
+                      {new Date(entry.startTime).toLocaleString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    <span className="font-mono">
+                      {formatTime(entry.duration)}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

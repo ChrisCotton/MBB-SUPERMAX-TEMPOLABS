@@ -155,7 +155,30 @@ const TaskList = ({
                         checked={task.completed}
                         onCheckedChange={(checked) => {
                           if (checked && !task.completed) {
-                            onComplete(task.id);
+                            // Mark task as complete
+                            import("@/lib/storage").then(
+                              async ({ updateTask }) => {
+                                try {
+                                  const updated = await updateTask(task.id, {
+                                    completed: true,
+                                    completedAt: new Date().toISOString(),
+                                  });
+                                  if (updated) {
+                                    // Refresh the task list
+                                    window.dispatchEvent(
+                                      new CustomEvent("task-updated"),
+                                    );
+                                    // Also call the onComplete prop for any parent component handling
+                                    onComplete(task.id);
+                                  }
+                                } catch (error) {
+                                  console.error(
+                                    "Error completing task:",
+                                    error,
+                                  );
+                                }
+                              },
+                            );
                           } else if (checked === false && task.completed) {
                             // If unchecking a completed task, mark it as pending
                             import("@/lib/storage").then(
@@ -163,6 +186,7 @@ const TaskList = ({
                                 try {
                                   const updated = await updateTask(task.id, {
                                     completed: false,
+                                    completedAt: undefined,
                                   });
                                   if (updated) {
                                     // Refresh the task list
@@ -245,10 +269,18 @@ const TaskList = ({
                                 <span>Mark as Complete</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => onStartTimer(task)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  onStartTimer(task);
+                                }}
                               >
                                 <Clock className="mr-2 h-4 w-4" />
-                                <span>Start Timer</span>
+                                <span>
+                                  {tasksInProgress.includes(task.id)
+                                    ? "View Timer"
+                                    : "Start Timer"}
+                                </span>
                               </DropdownMenuItem>
                             </>
                           )}

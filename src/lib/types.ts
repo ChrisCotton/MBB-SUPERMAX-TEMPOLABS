@@ -7,6 +7,13 @@ export interface Category {
   tasksCount?: number;
 }
 
+export interface TimeEntry {
+  id: string;
+  startTime: string;
+  endTime?: string;
+  duration: number; // Duration in seconds
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -19,12 +26,10 @@ export interface Task {
   priority: "low" | "medium" | "high";
   dueDate?: string;
   completedAt?: string;
-  actualTimeSpent?: number;
-  timeEntries?: Array<{
-    startTime: string;
-    endTime: string;
-    duration: number;
-  }>;
+  actualTimeSpent?: number; // Total time spent in hours
+  inProgress?: boolean; // Indicates if the task is currently being timed
+  timeEntries?: TimeEntry[];
+  currentSessionStartTime?: string; // ISO string of when the current timing session started
 }
 
 export interface User {
