@@ -18,6 +18,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import { MoreHorizontal, Edit, Trash, CheckCircle, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
@@ -70,9 +76,9 @@ const TaskList = ({
   onStartTimer = () => {},
 }: TaskListProps) => {
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [tasksInProgress, setTasksInProgress] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // Load categories to display category names instead of IDs
   useEffect(() => {
     const loadCategories = async () => {
       const storedCategories = await getCategories();
@@ -80,9 +86,39 @@ const TaskList = ({
     };
     loadCategories();
 
-    // Set up an interval to refresh categories periodically
     const intervalId = setInterval(loadCategories, 1000);
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const checkTasksInProgress = async () => {
+      try {
+        const { getTasks } = await import("@/lib/storage");
+        const allTasks = await getTasks();
+        const inProgressTaskIds = allTasks
+          .filter((task) => task.inProgress)
+          .map((task) => task.id);
+        setTasksInProgress(inProgressTaskIds);
+      } catch (error) {
+        console.error("Error checking tasks in progress:", error);
+      }
+    };
+
+    checkTasksInProgress();
+
+    const intervalId = setInterval(checkTasksInProgress, 2000);
+
+    const handleTaskUpdate = () => checkTasksInProgress();
+    window.addEventListener("task-timer-started", handleTaskUpdate);
+    window.addEventListener("task-timer-stopped", handleTaskUpdate);
+    window.addEventListener("task-updated", handleTaskUpdate);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("task-timer-started", handleTaskUpdate);
+      window.removeEventListener("task-timer-stopped", handleTaskUpdate);
+      window.removeEventListener("task-updated", handleTaskUpdate);
+    };
   }, []);
 
   const toggleTaskSelection = (taskId: string) => {
@@ -155,7 +191,6 @@ const TaskList = ({
                         checked={task.completed}
                         onCheckedChange={(checked) => {
                           if (checked && !task.completed) {
-                            // Mark task as complete
                             import("@/lib/storage").then(
                               async ({ updateTask }) => {
                                 try {
@@ -164,11 +199,9 @@ const TaskList = ({
                                     completedAt: new Date().toISOString(),
                                   });
                                   if (updated) {
-                                    // Refresh the task list
                                     window.dispatchEvent(
                                       new CustomEvent("task-updated"),
                                     );
-                                    // Also call the onComplete prop for any parent component handling
                                     onComplete(task.id);
                                   }
                                 } catch (error) {
@@ -180,7 +213,6 @@ const TaskList = ({
                               },
                             );
                           } else if (checked === false && task.completed) {
-                            // If unchecking a completed task, mark it as pending
                             import("@/lib/storage").then(
                               async ({ updateTask }) => {
                                 try {
@@ -189,7 +221,6 @@ const TaskList = ({
                                     completedAt: undefined,
                                   });
                                   if (updated) {
-                                    // Refresh the task list
                                     window.dispatchEvent(
                                       new CustomEvent("task-updated"),
                                     );
@@ -247,9 +278,25 @@ const TaskList = ({
                       ${calculateValue(task.hourlyRate, task.estimatedHours)}
                     </TableCell>
                     <TableCell className="text-center">
-                      <Badge variant={task.completed ? "success" : "secondary"}>
-                        {task.completed ? "Completed" : "Pending"}
-                      </Badge>
+                      <div className="flex items-center justify-center gap-2">
+                        <Badge
+                          variant={task.completed ? "success" : "secondary"}
+                        >
+                          {task.completed ? "Completed" : "Pending"}
+                        </Badge>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="animate-pulse">
+                                <Clock className="h-4 w-4 text-blue-500" />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Timer running</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

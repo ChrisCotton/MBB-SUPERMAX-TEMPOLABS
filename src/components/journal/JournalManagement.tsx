@@ -41,7 +41,18 @@ const JournalManagement = () => {
 
         if (error) throw error;
 
-        setEntries(data || []);
+        // Map database entries to frontend type with proper date handling
+        const mappedEntries = (data || []).map((entry) => ({
+          id: entry.id,
+          title: entry.title,
+          content: entry.content,
+          audioUrl: entry.audio_url ? entry.audio_url : undefined,
+          transcription: entry.transcription,
+          createdAt: entry.created_at,
+          userId: entry.user_id,
+        }));
+
+        setEntries(mappedEntries);
       } catch (error) {
         console.error("Error loading journal entries:", error);
       } finally {
@@ -120,7 +131,7 @@ const JournalManagement = () => {
         title: data.title,
         content: data.content,
         audioUrl: entryData.audioUrl, // Use the original audioUrl for frontend display
-        transcription: data.transcription,
+        transcription: entryData.transcription,
         createdAt: data.created_at,
         userId: data.user_id,
       };

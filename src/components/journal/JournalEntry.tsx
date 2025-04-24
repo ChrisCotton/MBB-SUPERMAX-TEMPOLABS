@@ -1,20 +1,5 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { format } from "date-fns";
-import { Mic, MicOff, Save, Trash2, Play, Pause, Clock } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -22,75 +7,79 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const formSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters" }),
-  content: z.string().min(1, { message: "Journal content is required" }),
-});
+import { Textarea } from "@/components/ui/textarea";
+import { Mic, Square, Save } from "lucide-react";
+import { transcribeAudio } from "@/lib/ai";
 
 interface JournalEntryProps {
-  onSave: (data: {
-    title: string;
-    content: string;
-    audioUrl?: string;
-    transcription?: string;
-  }) => void;
-  onCancel: () => void;
-  initialData?: {
-    title: string;
-    content: string;
-    audioUrl?: string;
-    transcription?: string;
-  };
+  id?: string;
+  title?: string;
+  content?: string;
+  audioUrl?: string;
+  transcription?: string;
+  date?: Date;
+  initialData?: any;
   isEditing?: boolean;
+  onSave?: (entry: {
+    id?: string;
+    title: string;
+    content: string;
+    audioUrl?: string;
+    transcription?: string;
+    date: Date;
+  }) => void;
+  onCancel?: () => void;
 }
 
 const JournalEntry = ({
-  onSave,
-  onCancel,
+  id,
+  title: initialTitle = "",
+  content: initialContent = "",
+  audioUrl: initialAudioUrl,
+  transcription: initialTranscription,
+  date: initialDate = new Date(),
   initialData,
   isEditing = false,
+  onSave,
+  onCancel,
 }: JournalEntryProps) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | undefined>(
-    initialData?.audioUrl,
+  const [title, setTitle] = useState(initialData?.title || initialTitle);
+  const [content, setContent] = useState(
+    initialData?.content || initialContent,
   );
-  const [transcription, setTranscription] = useState<string | undefined>(
-    initialData?.transcription,
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState(
+    initialData?.audioUrl || initialAudioUrl,
+  );
+  const [transcription, setTranscription] = useState(
+    initialData?.transcription || initialTranscription || "",
   );
   const [recordingTime, setRecordingTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [date, setDate] = useState(initialDate);
 
-  // References for recording
-  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
-  const audioChunksRef = React.useRef<Blob[]>([]);
-  const timerRef = React.useRef<number | null>(null);
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioBlobRef = useRef<Blob | null>(null);
+  const timerIntervalRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: initialData?.title || "",
-      content: initialData?.content || "",
-    },
-  });
+  useEffect(() => {
+    return () => {
+      if (timerIntervalRef.current) {
+        window.clearInterval(timerIntervalRef.current);
+      }
+    };
+  }, []);
 
-  // Format recording time as MM:SS
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
-      .toString()
-      .padStart(2, "0")}`;
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Start recording
   const startRecording = async () => {
     try {
-      setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
@@ -99,322 +88,160 @@ const JournalEntry = ({
         audioChunksRef.current.push(event.data);
       };
 
-      mediaRecorderRef.current.onstop = () => {
+      mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: "audio/wav",
         });
+        audioBlobRef.current = audioBlob;
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
 
-        // Create audio element for playback
-        if (audioRef.current) {
-          audioRef.current.src = url;
-        }
-
-        // Transcribe the audio
-        transcribeAudio(audioBlob);
+        // Automatically start transcription
+        await handleTranscription(audioBlob);
       };
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
+      startTimeRef.current = Date.now();
 
       // Start timer
-      setRecordingTime(0);
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-    } catch (err) {
-      console.error("Error starting recording:", err);
-      setError(
-        "Could not access microphone. Please ensure you have granted permission.",
-      );
+      if (timerIntervalRef.current) {
+        window.clearInterval(timerIntervalRef.current);
+      }
+
+      timerIntervalRef.current = window.setInterval(() => {
+        if (startTimeRef.current) {
+          const elapsed = (Date.now() - startTimeRef.current) / 1000;
+          setRecordingTime(elapsed);
+        }
+      }, 100);
+    } catch (error) {
+      console.error("Error starting recording:", error);
     }
   };
 
-  // Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach((track) => {
-        track.stop();
-      });
       setIsRecording(false);
 
       // Stop timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+      if (timerIntervalRef.current) {
+        window.clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
       }
+
+      // Stop all tracks on the stream
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop());
     }
   };
 
-  // Transcribe audio using AI service
-  const transcribeAudio = async (audioBlob: Blob) => {
+  const handleTranscription = async (audioBlob: Blob) => {
     try {
-      setError(null);
-
-      // First try to use the AI transcription service
-      const aiTranscription = await import("@/lib/ai")
-        .then(({ transcribeAudio }) => transcribeAudio(audioBlob))
-        .catch((err) => {
-          console.error("Error importing AI module:", err);
-          return null;
-        });
-
-      if (aiTranscription) {
-        console.log("Transcription successful:", aiTranscription);
-        setTranscription(aiTranscription);
-
-        // Optionally update the content field with the transcription
-        if (!form.getValues().content) {
-          form.setValue("content", aiTranscription);
+      setIsTranscribing(true);
+      const transcriptionText = await transcribeAudio(audioBlob);
+      if (transcriptionText) {
+        setTranscription(transcriptionText);
+        // If content is empty, automatically fill it with transcription
+        if (!content.trim()) {
+          setContent(transcriptionText);
         }
-        return;
       }
-
-      // Fallback to simulated transcription if AI service is not available
-      setError(
-        "AI transcription service not available. Using simulated transcription instead.",
-      );
-      setTimeout(() => {
-        const simulatedTranscription =
-          "This is a simulated transcription. To enable real transcription, please configure your AI API key in settings.";
-        setTranscription(simulatedTranscription);
-
-        // Optionally update the content field with the transcription
-        if (!form.getValues().content) {
-          form.setValue("content", simulatedTranscription);
-        }
-
-        setError(null);
-      }, 1500);
-    } catch (err) {
-      console.error("Error transcribing audio:", err);
-      setError("Failed to transcribe audio. Please try again.");
+    } catch (error) {
+      console.error("Error transcribing audio:", error);
+    } finally {
+      setIsTranscribing(false);
     }
   };
 
-  // Toggle audio playback
-  const togglePlayback = () => {
-    if (!audioRef.current || !audioUrl) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-
-    setIsPlaying(!isPlaying);
-  };
-
-  // Handle audio playback events
-  React.useEffect(() => {
-    const audio = new Audio();
-    audioRef.current = audio;
-
-    if (audioUrl) {
-      audio.src = audioUrl;
-    }
-
-    audio.onended = () => {
-      setIsPlaying(false);
-    };
-
-    return () => {
-      audio.pause();
-      audio.src = "";
-    };
-  }, [audioUrl]);
-
-  // Clean up on unmount
-  React.useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      if (mediaRecorderRef.current && isRecording) {
-        mediaRecorderRef.current.stop();
-        mediaRecorderRef.current.stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      }
-    };
-  }, [isRecording]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setError(null);
-      console.log("Submitting journal entry:", {
-        title: values.title,
-        content: values.content,
+  const handleSave = () => {
+    if (onSave) {
+      onSave({
+        id,
+        title,
+        content,
         audioUrl,
         transcription,
+        date: new Date(),
       });
-      await onSave({
-        title: values.title,
-        content: values.content,
-        audioUrl,
-        transcription,
-      });
-    } catch (err) {
-      console.error("Error saving journal entry:", err);
-      setError("Failed to save journal entry. Please try again.");
     }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full bg-white">
       <CardHeader>
         <CardTitle>
-          {isEditing ? "Edit Journal Entry" : "New Journal Entry"}
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Journal Entry Title"
+            className="w-full border-none text-xl font-semibold focus:outline-none"
+          />
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter a title for your journal entry"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+      <CardContent className="space-y-4">
+        <Textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Write your thoughts here..."
+          className="min-h-[200px]"
+        />
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <FormLabel>Voice Recording</FormLabel>
-                <div className="flex items-center gap-2">
-                  {isRecording ? (
-                    <Badge variant="destructive" className="animate-pulse">
-                      Recording {formatTime(recordingTime)}
-                    </Badge>
-                  ) : audioUrl ? (
-                    <Badge variant="outline">Recording Available</Badge>
-                  ) : null}
-                </div>
-              </div>
+        {audioUrl && (
+          <div className="mt-4">
+            <audio src={audioUrl} controls className="w-full" />
+          </div>
+        )}
 
-              <div className="flex flex-wrap gap-2">
-                {isRecording ? (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={stopRecording}
-                    className="flex items-center gap-1"
-                  >
-                    <MicOff className="h-4 w-4" />
-                    Stop Recording
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={startRecording}
-                    className="flex items-center gap-1"
-                  >
-                    <Mic className="h-4 w-4" />
-                    Start Recording
-                  </Button>
-                )}
-
-                {audioUrl && (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={togglePlayback}
-                      className="flex items-center gap-1"
-                    >
-                      {isPlaying ? (
-                        <>
-                          <Pause className="h-4 w-4" />
-                          Pause
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-4 w-4" />
-                          Play Recording
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setAudioUrl(undefined);
-                        setTranscription(undefined);
-                        if (audioRef.current) {
-                          audioRef.current.src = "";
-                        }
-                      }}
-                      className="flex items-center gap-1"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete Recording
-                    </Button>
-                  </>
-                )}
-              </div>
-
-              {transcription && (
-                <div className="mt-2 p-3 bg-muted rounded-md">
-                  <p className="text-sm font-medium mb-1">Transcription:</p>
-                  <p className="text-sm">{transcription}</p>
-                </div>
-              )}
-
-              {error && (
-                <Alert variant="destructive" className="mt-2">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+        {transcription && (
+          <div className="mt-2">
+            <h3 className="text-sm font-medium mb-1">Transcription</h3>
+            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+              {transcription}
             </div>
+          </div>
+        )}
 
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Journal Content</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Write your thoughts, insights, or reflections..."
-                      className="min-h-[200px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+        {isTranscribing && (
+          <div className="flex items-center justify-center py-2">
+            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full mr-2"></div>
+            <span className="text-sm">Transcribing audio...</span>
+          </div>
+        )}
       </CardContent>
-      <CardFooter className="flex justify-end space-x-2">
-        <Button variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          onClick={form.handleSubmit(onSubmit)}
-          className="flex items-center gap-1"
-        >
-          <Save className="h-4 w-4" />
-          Save Entry
-        </Button>
+      <CardFooter className="flex justify-between">
+        <div className="flex items-center gap-2">
+          {isRecording ? (
+            <>
+              <Button variant="destructive" size="sm" onClick={stopRecording}>
+                <Square className="mr-2 h-4 w-4" />
+                Stop Recording
+              </Button>
+              <span className="text-sm text-gray-500">
+                {formatTime(recordingTime)}
+              </span>
+            </>
+          ) : (
+            <Button variant="outline" size="sm" onClick={startRecording}>
+              <Mic className="mr-2 h-4 w-4" />
+              Record Audio
+            </Button>
+          )}
+        </div>
+        <div className="flex gap-2">
+          {onCancel && (
+            <Button variant="outline" size="sm" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
+          <Button size="sm" onClick={handleSave}>
+            <Save className="mr-2 h-4 w-4" />
+            Save Entry
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

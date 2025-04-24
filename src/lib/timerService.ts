@@ -77,7 +77,7 @@ export const timerService = {
         .update({
           end_time: now,
           duration: durationSeconds,
-          is_running: false,
+          // No is_running field, end_time not null indicates stopped
         })
         .eq("id", timeEntry.id);
 
@@ -181,7 +181,7 @@ export const timerService = {
         .select("duration")
         .eq("task_id", taskId)
         .eq("user_id", user.id)
-        .eq("is_running", false);
+        .not("end_time", "is", null);
 
       if (entriesError) throw entriesError;
 
@@ -231,6 +231,7 @@ export const timerService = {
         startTime: entry.start_time,
         endTime: entry.end_time,
         duration: entry.duration || 0,
+        // No is_running field needed
       }));
     } catch (error) {
       console.error("Error getting time entries:", error);

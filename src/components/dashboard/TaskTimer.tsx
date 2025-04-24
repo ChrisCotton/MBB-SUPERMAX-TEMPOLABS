@@ -77,15 +77,17 @@ const TaskTimer = ({
   const startTimerInterval = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
+      timerRef.current = null;
     }
 
     timerRef.current = window.setInterval(async () => {
       if (task) {
-        const { elapsedTime: newElapsedTime } =
+        const { elapsedTime: newElapsedTime, isRunning: timerRunning } =
           await timerService.getTimerState(task.id);
         setElapsedTime(newElapsedTime);
+        setIsRunning(timerRunning);
       }
-    }, 1000);
+    }, 500);
   };
 
   // Start the timer
@@ -97,6 +99,12 @@ const TaskTimer = ({
       if (success) {
         setIsRunning(true);
         startTimerInterval();
+        // Dispatch event to notify other components
+        window.dispatchEvent(
+          new CustomEvent("task-timer-started", {
+            detail: { taskId: task.id },
+          }),
+        );
       }
     } catch (error) {
       console.error("Error starting timer:", error);
@@ -105,10 +113,18 @@ const TaskTimer = ({
 
   // Pause the timer
   const pauseTimer = async () => {
-    if (!task || !isRunning) return;
+    if (!task || !isRunning) {
+      console.log("Cannot pause: task is null or timer not running", {
+        task,
+        isRunning,
+      });
+      return;
+    }
 
     try {
+      console.log("Pausing timer for task:", task.id);
       const success = await timerService.pauseTimer(task.id);
+      console.log("Timer pause result:", success);
       if (success) {
         setIsRunning(false);
         if (timerRef.current) {
@@ -119,6 +135,13 @@ const TaskTimer = ({
         // Refresh time entries
         const entries = await timerService.getTimeEntries(task.id);
         setTimeEntries(entries);
+
+        // Dispatch event to notify other components
+        window.dispatchEvent(
+          new CustomEvent("task-timer-stopped", {
+            detail: { taskId: task.id },
+          }),
+        );
       }
     } catch (error) {
       console.error("Error pausing timer:", error);

@@ -24,6 +24,11 @@ const mapTaskFromDB = (dbTask: Tables<"tasks">): Task => ({
   estimatedHours: dbTask.estimated_hours,
   completed: dbTask.completed,
   createdAt: dbTask.created_at,
+  completedAt: dbTask.completed_at,
+  actualTimeSpent: dbTask.actual_time_spent,
+  inProgress: dbTask.in_progress,
+  currentSessionStartTime: dbTask.current_session_start_time,
+  priority: dbTask.priority || "medium",
 });
 
 const mapBalanceFromDB = (

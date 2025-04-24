@@ -88,10 +88,15 @@ const JournalList = ({
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return "Date unavailable";
 
-    const date = new Date(dateString);
-    if (!isValid(date)) return "Date unavailable";
+    try {
+      const date = new Date(dateString);
+      if (!isValid(date)) return "Date unavailable";
 
-    return format(date, "MMM d, yyyy h:mm a");
+      return format(date, "MMM d, yyyy h:mm a");
+    } catch (error) {
+      console.error("Error formatting date:", error, dateString);
+      return format(new Date(), "MMM d, yyyy h:mm a"); // Fallback to current date
+    }
   };
 
   return (
@@ -141,7 +146,9 @@ const JournalList = ({
                   <div>
                     <CardTitle className="text-lg">{entry.title}</CardTitle>
                     <CardDescription>
-                      {formatDate(entry.createdAt)}
+                      {entry.createdAt
+                        ? formatDate(entry.createdAt)
+                        : format(new Date(), "MMM d, yyyy h:mm a")}
                     </CardDescription>
                   </div>
                   <DropdownMenu>
