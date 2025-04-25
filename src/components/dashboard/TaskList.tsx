@@ -1,33 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { getCategories } from "@/lib/storage";
-import { Category } from "@/lib/types";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Badge } from "../ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
-import { MoreHorizontal, Edit, Trash, CheckCircle, Clock } from "lucide-react";
+import { Category, Task } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
-import { Task } from "@/lib/types";
+import TaskTable from "./TaskTable";
 
 interface TaskListProps {
   tasks?: Task[];
@@ -48,6 +23,7 @@ const TaskList = ({
       estimatedHours: 3,
       completed: false,
       createdAt: "2023-06-15T10:30:00Z",
+      priority: "medium",
     },
     {
       id: "2",
@@ -58,6 +34,7 @@ const TaskList = ({
       estimatedHours: 0.5,
       completed: true,
       createdAt: "2023-06-15T08:00:00Z",
+      priority: "low",
     },
     {
       id: "3",
@@ -68,6 +45,7 @@ const TaskList = ({
       estimatedHours: 2,
       completed: false,
       createdAt: "2023-06-16T09:15:00Z",
+      priority: "high",
     },
   ],
   onEdit = () => {},
@@ -137,217 +115,24 @@ const TaskList = ({
     }
   };
 
-  const calculateValue = (hourlyRate: number, estimatedHours: number) => {
-    return (hourlyRate * estimatedHours).toFixed(2);
-  };
-
   return (
     <Card className="w-full bg-white shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">Tasks</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={
-                      selectedTasks.length === tasks.length && tasks.length > 0
-                    }
-                    onCheckedChange={toggleAllTasks}
-                    aria-label="Select all tasks"
-                  />
-                </TableHead>
-                <TableHead>Task</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-center">Priority</TableHead>
-                <TableHead className="text-right">Hourly Rate</TableHead>
-                <TableHead className="text-right">Hours</TableHead>
-                <TableHead className="text-right">Value</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="w-16">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tasks.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={8}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No tasks found. Add a new task to get started.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                tasks.map((task) => (
-                  <TableRow
-                    key={task.id}
-                    className={task.completed ? "bg-muted/50" : ""}
-                  >
-                    <TableCell>
-                      <Checkbox
-                        checked={task.completed}
-                        onCheckedChange={(checked) => {
-                          if (checked && !task.completed) {
-                            import("@/lib/storage").then(
-                              async ({ updateTask }) => {
-                                try {
-                                  const updated = await updateTask(task.id, {
-                                    completed: true,
-                                    completedAt: new Date().toISOString(),
-                                  });
-                                  if (updated) {
-                                    window.dispatchEvent(
-                                      new CustomEvent("task-updated"),
-                                    );
-                                    onComplete(task.id);
-                                  }
-                                } catch (error) {
-                                  console.error(
-                                    "Error completing task:",
-                                    error,
-                                  );
-                                }
-                              },
-                            );
-                          } else if (checked === false && task.completed) {
-                            import("@/lib/storage").then(
-                              async ({ updateTask }) => {
-                                try {
-                                  const updated = await updateTask(task.id, {
-                                    completed: false,
-                                    completedAt: undefined,
-                                  });
-                                  if (updated) {
-                                    window.dispatchEvent(
-                                      new CustomEvent("task-updated"),
-                                    );
-                                  }
-                                } catch (error) {
-                                  console.error(
-                                    "Error unchecking task:",
-                                    error,
-                                  );
-                                }
-                              },
-                            );
-                          }
-                        }}
-                        aria-label={`Select task ${task.title}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{task.title}</div>
-                      <div className="text-sm text-muted-foreground truncate max-w-[200px]">
-                        {task.description}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {categories.find((cat) => cat.id === task.category)
-                          ?.name || "Unknown Category"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        variant={
-                          task.priority === "high"
-                            ? "destructive"
-                            : task.priority === "medium"
-                              ? "secondary"
-                              : "outline"
-                        }
-                      >
-                        {task.priority || "medium"}
-                      </Badge>
-                      {task.dueDate && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Due: {new Date(task.dueDate).toLocaleDateString()}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      ${task.hourlyRate}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {task.estimatedHours}
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      ${calculateValue(task.hourlyRate, task.estimatedHours)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-2">
-                        <Badge
-                          variant={task.completed ? "success" : "secondary"}
-                        >
-                          {task.completed ? "Completed" : "Pending"}
-                        </Badge>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="animate-pulse">
-                                <Clock className="h-4 w-4 text-blue-500" />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Timer running</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {!task.completed && (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() => onComplete(task.id)}
-                              >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                <span>Mark as Complete</span>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                  onStartTimer(task);
-                                }}
-                              >
-                                <Clock className="mr-2 h-4 w-4" />
-                                <span>
-                                  {tasksInProgress.includes(task.id)
-                                    ? "View Timer"
-                                    : "Start Timer"}
-                                </span>
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                          <DropdownMenuItem onClick={() => onEdit(task)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            <span>Edit</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDelete(task.id)}>
-                            <Trash className="mr-2 h-4 w-4" />
-                            <span>Delete</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <TaskTable
+          tasks={tasks}
+          categories={categories}
+          selectedTasks={selectedTasks}
+          tasksInProgress={tasksInProgress}
+          toggleTaskSelection={toggleTaskSelection}
+          toggleAllTasks={toggleAllTasks}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onComplete={onComplete}
+          onStartTimer={onStartTimer}
+        />
       </CardContent>
     </Card>
   );

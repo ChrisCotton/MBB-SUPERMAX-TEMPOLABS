@@ -30,6 +30,7 @@ export interface Task {
   inProgress?: boolean; // Indicates if the task is currently being timed
   timeEntries?: TimeEntry[];
   currentSessionStartTime?: string; // ISO string of when the current timing session started
+  dailyBalance?: number; // Daily accumulated mental bank balance for the task
 }
 
 export interface User {

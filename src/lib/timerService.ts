@@ -125,23 +125,40 @@ export const timerService = {
       const user = await getCurrentUser();
       if (!user) return false;
 
-      // Update the task with the actual time spent
-      const { data: task, error: fetchError } = await supabase
+      // Calculate daily balance contribution
+      const { data: taskData, error: taskFetchError } = await supabase
         .from("tasks")
-        .select("actual_time_spent")
+        .select("hourly_rate")
+        .eq("id", taskId)
+        .eq("user_id", user.id)
+        .single();
+
+      if (taskFetchError) throw taskFetchError;
+
+      const hourlyRate = taskData.hourly_rate || 0;
+      const dailyBalanceContribution = parseFloat(
+        (hourlyRate * timeSpentHours).toFixed(2),
+      );
+
+      // First get the current daily balance
+      const { data: currentTask, error: fetchError } = await supabase
+        .from("tasks")
+        .select("daily_balance")
         .eq("id", taskId)
         .eq("user_id", user.id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      const currentTimeSpent = task.actual_time_spent || 0;
-      const newTimeSpent = currentTimeSpent + timeSpentHours;
+      // Calculate the new balance
+      const currentBalance = currentTask.daily_balance || 0;
+      const newBalance = currentBalance + dailyBalanceContribution;
 
+      // Update the task with the new daily balance
       const { error: updateError } = await supabase
         .from("tasks")
         .update({
-          actual_time_spent: newTimeSpent,
+          daily_balance: newBalance,
         })
         .eq("id", taskId)
         .eq("user_id", user.id);

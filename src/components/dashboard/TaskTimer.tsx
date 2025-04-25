@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Task, TimeEntry } from "@/lib/types";
 import { timerService } from "@/lib/timerService";
+import { updateTask } from "@/lib/storage";
 
 interface TaskTimerProps {
   task?: Task | null;
@@ -24,7 +25,6 @@ const TaskTimer = ({
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const timerRef = useRef<number | null>(null);
 
-  // Format time as HH:MM:SS
   const formatTime = (timeInSeconds: number) => {
     const hours = Math.floor(timeInSeconds / 3600);
     const minutes = Math.floor((timeInSeconds % 3600) / 60);
@@ -37,23 +37,19 @@ const TaskTimer = ({
     ].join(":");
   };
 
-  // Load timer state from Supabase when task changes
   useEffect(() => {
     if (!task) return;
 
     const loadTimerState = async () => {
       try {
-        // Get the current timer state
         const { isRunning: running, elapsedTime: elapsed } =
           await timerService.getTimerState(task.id);
         setIsRunning(running);
         setElapsedTime(elapsed);
 
-        // Get time entries
         const entries = await timerService.getTimeEntries(task.id);
         setTimeEntries(entries);
 
-        // If the timer is running, start the interval
         if (running) {
           startTimerInterval();
         }
@@ -64,7 +60,6 @@ const TaskTimer = ({
 
     loadTimerState();
 
-    // Clean up interval on unmount or when task changes
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -73,7 +68,6 @@ const TaskTimer = ({
     };
   }, [task?.id]);
 
-  // Start the timer interval to update the UI
   const startTimerInterval = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -90,7 +84,6 @@ const TaskTimer = ({
     }, 500);
   };
 
-  // Start the timer
   const startTimer = async () => {
     if (!task || isRunning) return;
 
@@ -99,7 +92,6 @@ const TaskTimer = ({
       if (success) {
         setIsRunning(true);
         startTimerInterval();
-        // Dispatch event to notify other components
         window.dispatchEvent(
           new CustomEvent("task-timer-started", {
             detail: { taskId: task.id },
@@ -111,7 +103,6 @@ const TaskTimer = ({
     }
   };
 
-  // Pause the timer
   const pauseTimer = async () => {
     if (!task || !isRunning) {
       console.log("Cannot pause: task is null or timer not running", {
@@ -132,11 +123,9 @@ const TaskTimer = ({
           timerRef.current = null;
         }
 
-        // Refresh time entries
         const entries = await timerService.getTimeEntries(task.id);
         setTimeEntries(entries);
 
-        // Dispatch event to notify other components
         window.dispatchEvent(
           new CustomEvent("task-timer-stopped", {
             detail: { taskId: task.id },
@@ -148,7 +137,6 @@ const TaskTimer = ({
     }
   };
 
-  // Stop the timer and prompt to save
   const stopTimer = async () => {
     if (!task) return;
 
@@ -162,7 +150,6 @@ const TaskTimer = ({
         }
         setShowSavePrompt(true);
 
-        // Refresh time entries
         const entries = await timerService.getTimeEntries(task.id);
         setTimeEntries(entries);
       }
@@ -171,7 +158,6 @@ const TaskTimer = ({
     }
   };
 
-  // Save the logged time
   const saveTime = async () => {
     if (!task) return;
 
@@ -179,12 +165,25 @@ const TaskTimer = ({
       // Convert to hours for consistency with estimated hours
       const timeSpentHours = parseFloat((elapsedTime / 3600).toFixed(2));
 
+      // Calculate daily mental bank balance contribution
+      const dailyBalanceContribution = parseFloat(
+        (task.hourlyRate * timeSpentHours).toFixed(2),
+      );
+
       // Save the time to the task
       const success = await timerService.saveTimeToTask(
         task.id,
         timeSpentHours,
       );
+
       if (success) {
+        // Update local task state with the new daily balance
+        if (task) {
+          const updatedDailyBalance =
+            (task.dailyBalance || 0) + dailyBalanceContribution;
+          task.dailyBalance = updatedDailyBalance;
+        }
+
         // Notify parent component
         onTimeLogged(task.id, timeSpentHours);
 
@@ -192,18 +191,20 @@ const TaskTimer = ({
         setSavedTime(elapsedTime);
         setElapsedTime(0);
         setShowSavePrompt(false);
+
+        // Refresh time entries
+        const entries = await timerService.getTimeEntries(task.id);
+        setTimeEntries(entries);
       }
     } catch (error) {
       console.error("Error saving time:", error);
     }
   };
 
-  // Discard the current timer session
   const discardTime = () => {
     setShowSavePrompt(false);
   };
 
-  // Clean up interval on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -264,6 +265,14 @@ const TaskTimer = ({
                 </Badge>
               )}
               <Badge variant="outline">${task.hourlyRate}/hr</Badge>
+              {task.dailyBalance !== undefined && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm font-medium text-green-800">
+                    Today's Balance For This Task: $
+                    {task.dailyBalance.toFixed(2)}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
