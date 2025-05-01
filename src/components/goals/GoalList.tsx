@@ -35,11 +35,14 @@ import {
 import GoalForm from "./GoalForm";
 
 interface GoalListProps {
-  goals: Goal[];
-  onUpdateGoal: (id: string, goalData: Partial<Goal>) => Promise<void>;
+  goals?: Goal[];
+  onUpdateGoal?: (id: string, goalData: Partial<Goal>) => Promise<void>;
 }
 
-const GoalList = ({ goals, onUpdateGoal }: GoalListProps) => {
+const GoalList = ({
+  goals = [],
+  onUpdateGoal = async () => {},
+}: GoalListProps) => {
   const [openGoalId, setOpenGoalId] = useState<string | null>(null);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
 
@@ -115,7 +118,7 @@ const GoalList = ({ goals, onUpdateGoal }: GoalListProps) => {
     );
   };
 
-  if (goals.length === 0) {
+  if (!goals || goals.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
         <Award className="h-12 w-12 mx-auto mb-3 text-gray-300" />

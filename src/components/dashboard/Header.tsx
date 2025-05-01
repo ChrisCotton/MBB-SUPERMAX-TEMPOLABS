@@ -77,10 +77,28 @@ const Header = ({ userAvatar = "", onLogout = () => {} }: HeaderProps) => {
                   Categories
                 </Link>
                 <Link
-                  to="/reports"
+                  to="/charts"
                   className="text-lg font-medium hover:text-primary"
                 >
-                  Reports
+                  Charts
+                </Link>
+                <Link
+                  to="/goals"
+                  className="text-lg font-medium hover:text-primary"
+                >
+                  Goals
+                </Link>
+                <Link
+                  to="/journal"
+                  className="text-lg font-medium hover:text-primary"
+                >
+                  Journal
+                </Link>
+                <Link
+                  to="/profile"
+                  className="text-lg font-medium hover:text-primary"
+                >
+                  Profile
                 </Link>
               </nav>
             </SheetContent>
@@ -125,10 +143,28 @@ const Header = ({ userAvatar = "", onLogout = () => {} }: HeaderProps) => {
             Categories
           </Link>
           <Link
-            to="/reports"
+            to="/charts"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
-            Reports
+            Charts
+          </Link>
+          <Link
+            to="/goals"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Goals
+          </Link>
+          <Link
+            to="/journal"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Journal
+          </Link>
+          <Link
+            to="/profile"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            Profile
           </Link>
         </nav>
 

@@ -48,11 +48,11 @@ interface VisionBoardProps {
 }
 
 const VisionBoard: React.FC<VisionBoardProps> = ({
-  visionBoards,
-  isLoading,
-  onUpload,
-  onUpdate,
-  onDelete,
+  visionBoards = [],
+  isLoading = false,
+  onUpload = async () => {},
+  onUpdate = async () => {},
+  onDelete = async () => {},
 }) => {
   const [activeTab, setActiveTab] = useState<"gallery" | "upload">("gallery");
   const [selectedImage, setSelectedImage] = useState<VisionBoardType | null>(
@@ -144,7 +144,7 @@ const VisionBoard: React.FC<VisionBoardProps> = ({
         </TabsList>
 
         <TabsContent value="gallery" className="pt-6">
-          {visionBoards.length === 0 ? (
+          {!visionBoards || visionBoards.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium mb-2">No vision boards yet</h3>
@@ -157,65 +157,69 @@ const VisionBoard: React.FC<VisionBoardProps> = ({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visionBoards.map((board) => (
-                <Card key={board.id} className="overflow-hidden group relative">
-                  <div
-                    className="aspect-video bg-cover bg-center cursor-pointer"
-                    style={{ backgroundImage: `url(${board.imageUrl})` }}
-                    onClick={() => setSelectedImage(board)}
-                  ></div>
-                  <CardContent className="p-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-medium truncate">
-                          {board.title || "Untitled Vision Board"}
-                        </h3>
-                        {board.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {board.description}
-                          </p>
-                        )}
+              {visionBoards &&
+                visionBoards.map((board) => (
+                  <Card
+                    key={board.id}
+                    className="overflow-hidden group relative"
+                  >
+                    <div
+                      className="aspect-video bg-cover bg-center cursor-pointer"
+                      style={{ backgroundImage: `url(${board.imageUrl})` }}
+                      onClick={() => setSelectedImage(board)}
+                    ></div>
+                    <CardContent className="p-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-medium truncate">
+                            {board.title || "Untitled Vision Board"}
+                          </h3>
+                          {board.description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {board.description}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditDialog(board)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Vision Board
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this vision
+                                  board? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onDelete(board.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       </div>
-                      <div className="flex space-x-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditDialog(board)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                Delete Vision Board
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this vision
-                                board? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDelete(board.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           )}
         </TabsContent>
