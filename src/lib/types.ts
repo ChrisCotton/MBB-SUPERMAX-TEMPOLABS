@@ -89,3 +89,12 @@ export interface GoalMilestone {
   reward?: string;
   createdAt: string;
 }
+
+export interface VisionBoard {
+  id: string;
+  title?: string;
+  description?: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt?: string;
+}
