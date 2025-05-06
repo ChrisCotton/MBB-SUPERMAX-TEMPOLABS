@@ -14,6 +14,7 @@ import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 interface Milestone {
   id: string;
   goal_id: string;
+  user_id: string;
   title: string;
   description: string;
   due_date: string;
@@ -24,36 +25,50 @@ interface Milestone {
 export default function GoalMilestoneList() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchMilestones() {
       try {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user?.user) {
+          setLoading(false);
+          return;
+        }
+
         const { data: goalMilestones, error } = await supabase
           .from("goal_milestones")
           .select("*")
+          .eq("user_id", user.user.id)
           .order("due_date", { ascending: true });
 
         if (error) throw error;
 
         // Process milestones to determine status based on due date
-        const processedMilestones = goalMilestones.map((milestone: any) => {
-          const dueDate = new Date(milestone.due_date);
-          const today = new Date();
+        const processedMilestones = Array.isArray(goalMilestones)
+          ? goalMilestones.map((milestone: any) => {
+              const dueDate = new Date(milestone.due_date);
+              const today = new Date();
 
-          let status = milestone.status;
-          if (status !== "completed" && dueDate < today) {
-            status = "overdue";
-          }
+              let status = milestone.status;
+              if (status !== "completed" && dueDate < today) {
+                status = "overdue";
+              }
 
-          return {
-            ...milestone,
-            status,
-          };
-        });
+              return {
+                ...milestone,
+                status,
+              };
+            })
+          : [];
 
         setMilestones(processedMilestones);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching milestones:", error);
+        // Don't show error UI for 502 errors (temporary server issues)
+        if (!(error.message && error.message.includes("502"))) {
+          setError(error.message || "Failed to load milestones");
+        }
       } finally {
         setLoading(false);
       }
@@ -87,6 +102,20 @@ export default function GoalMilestoneList() {
 
   if (loading) {
     return <div className="flex justify-center p-8">Loading milestones...</div>;
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Milestones</CardTitle>
+          <CardDescription>Error loading milestones</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4 text-red-500">{error}</div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (milestones.length === 0) {
