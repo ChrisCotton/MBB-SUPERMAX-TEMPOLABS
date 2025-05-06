@@ -145,6 +145,51 @@ export type Database = {
           },
         ]
       }
+      google_calendar_settings: {
+        Row: {
+          access_token: string | null
+          auto_sync_new_tasks: boolean
+          created_at: string | null
+          id: string
+          is_connected: boolean
+          refresh_token: string | null
+          selected_calendar_id: string | null
+          sync_completed_tasks: boolean
+          sync_high_priority_only: boolean
+          token_expiry: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          auto_sync_new_tasks?: boolean
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean
+          refresh_token?: string | null
+          selected_calendar_id?: string | null
+          sync_completed_tasks?: boolean
+          sync_high_priority_only?: boolean
+          token_expiry?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          auto_sync_new_tasks?: boolean
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean
+          refresh_token?: string | null
+          selected_calendar_id?: string | null
+          sync_completed_tasks?: boolean
+          sync_high_priority_only?: boolean
+          token_expiry?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           audio_url: string | null
@@ -207,6 +252,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      task_calendar_events: {
+        Row: {
+          calendar_id: string
+          created_at: string | null
+          event_id: string
+          id: string
+          last_synced: string | null
+          task_id: string
+        }
+        Insert: {
+          calendar_id: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          last_synced?: string | null
+          task_id: string
+        }
+        Update: {
+          calendar_id?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          last_synced?: string | null
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_calendar_events_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tasks: {
         Row: {
@@ -322,9 +402,17 @@ export type Database = {
           created_at: string
           daily_goal: number | null
           dark_mode: boolean | null
+          email: string | null
           email_notifications: boolean | null
+          first_name: string | null
           id: string
+          initial_balance: number | null
+          last_name: string | null
           name: string | null
+          notification_daily_updates: boolean | null
+          notification_goal_achievement: boolean | null
+          notification_task_reminders: boolean | null
+          phone: string | null
           target_balance: number | null
           updated_at: string
           user_id: string
@@ -337,9 +425,17 @@ export type Database = {
           created_at?: string
           daily_goal?: number | null
           dark_mode?: boolean | null
+          email?: string | null
           email_notifications?: boolean | null
+          first_name?: string | null
           id?: string
+          initial_balance?: number | null
+          last_name?: string | null
           name?: string | null
+          notification_daily_updates?: boolean | null
+          notification_goal_achievement?: boolean | null
+          notification_task_reminders?: boolean | null
+          phone?: string | null
           target_balance?: number | null
           updated_at?: string
           user_id: string
@@ -352,9 +448,17 @@ export type Database = {
           created_at?: string
           daily_goal?: number | null
           dark_mode?: boolean | null
+          email?: string | null
           email_notifications?: boolean | null
+          first_name?: string | null
           id?: string
+          initial_balance?: number | null
+          last_name?: string | null
           name?: string | null
+          notification_daily_updates?: boolean | null
+          notification_goal_achievement?: boolean | null
+          notification_task_reminders?: boolean | null
+          phone?: string | null
           target_balance?: number | null
           updated_at?: string
           user_id?: string
@@ -381,6 +485,36 @@ export type Database = {
           ai_config?: Json | null
           created_at?: string | null
           id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vision_boards: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string
+          title: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          title?: string | null
           updated_at?: string | null
           user_id?: string
         }

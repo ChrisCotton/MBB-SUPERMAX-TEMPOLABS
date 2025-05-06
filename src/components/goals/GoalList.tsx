@@ -12,7 +12,7 @@ interface Goal {
   title: string;
   description: string;
   target_date: string;
-  status: string;
+  status: string | null;
   progress: number;
   created_at: string;
 }
@@ -43,7 +43,9 @@ export default function GoalList() {
     fetchGoals();
   }, []);
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string | null | undefined) => {
+    if (!status) return <Clock className="h-5 w-5 text-gray-500" />;
+
     switch (status.toLowerCase()) {
       case "completed":
         return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -56,7 +58,9 @@ export default function GoalList() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null | undefined) => {
+    if (!status) return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+
     switch (status.toLowerCase()) {
       case "completed":
         return "bg-green-100 text-green-800 hover:bg-green-200";
@@ -102,7 +106,7 @@ export default function GoalList() {
               <Badge className={getStatusColor(goal.status)}>
                 <span className="flex items-center gap-1">
                   {getStatusIcon(goal.status)}
-                  {goal.status}
+                  {goal.status || "In Progress"}
                 </span>
               </Badge>
             </div>
