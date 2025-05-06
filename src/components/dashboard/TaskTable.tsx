@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Task, Category } from "@/lib/types";
+import React from "react";
+import { Category, Task } from "@/lib/types";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
 import {
   Table,
   TableBody,
@@ -8,30 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { Badge } from "../ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
-import {
-  MoreHorizontal,
-  Edit,
-  Trash,
-  CheckCircle,
-  Clock,
-  ArrowDown,
-  ArrowUp,
-} from "lucide-react";
+import { Play, Edit, Trash2, CheckCircle } from "lucide-react";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -46,21 +25,7 @@ interface TaskTableProps {
   onStartTimer: (task: Task) => void;
 }
 
-type SortField =
-  | "title"
-  | "category"
-  | "priority"
-  | "hourlyRate"
-  | "estimatedHours"
-  | "value"
-  | "status";
-
-interface SortState {
-  field: SortField;
-  direction: "asc" | "desc";
-}
-
-const TaskTable: React.FC<TaskTableProps> = ({
+const TaskTable = ({
   tasks,
   categories,
   selectedTasks,
@@ -71,76 +36,39 @@ const TaskTable: React.FC<TaskTableProps> = ({
   onDelete,
   onComplete,
   onStartTimer,
-}) => {
-  // Default sort by priority, highest to lowest
-  const [sortState, setSortState] = useState<SortState>({
-    field: "priority",
-    direction: "desc",
-  });
-
-  const handleSort = (field: SortField) => {
-    setSortState((prev) => ({
-      field,
-      direction:
-        prev.field === field && prev.direction === "desc" ? "asc" : "desc",
-    }));
-  };
-
-  const calculateValue = (hourlyRate: number, estimatedHours: number) => {
-    return (hourlyRate * estimatedHours).toFixed(2);
-  };
-
-  const getSortIcon = (field: SortField) => {
-    if (sortState.field !== field) return null;
-    return sortState.direction === "asc" ? (
-      <ArrowUp className="ml-1 h-4 w-4 inline" />
-    ) : (
-      <ArrowDown className="ml-1 h-4 w-4 inline" />
-    );
-  };
-
-  // Sort tasks based on current sort state
-  const sortedTasks = [...tasks].sort((a, b) => {
-    const direction = sortState.direction === "asc" ? 1 : -1;
-
-    switch (sortState.field) {
-      case "title":
-        return a.title.localeCompare(b.title) * direction;
-
-      case "category":
-        const catA =
-          categories.find((cat) => cat.id === a.category)?.name || "";
-        const catB =
-          categories.find((cat) => cat.id === b.category)?.name || "";
-        return catA.localeCompare(catB) * direction;
-
-      case "priority":
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
-        const priorityA = priorityOrder[a.priority || "medium"] || 2;
-        const priorityB = priorityOrder[b.priority || "medium"] || 2;
-        return (priorityA - priorityB) * direction;
-
-      case "hourlyRate":
-        return (a.hourlyRate - b.hourlyRate) * direction;
-
-      case "estimatedHours":
-        return (a.estimatedHours - b.estimatedHours) * direction;
-
-      case "value":
-        const valueA = a.hourlyRate * a.estimatedHours;
-        const valueB = b.hourlyRate * b.estimatedHours;
-        return (valueA - valueB) * direction;
-
-      case "status":
-        return (Number(a.completed) - Number(b.completed)) * direction;
-
+}: TaskTableProps) => {
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case "high":
+        return "text-red-500";
+      case "medium":
+        return "text-yellow-500";
+      case "low":
+        return "text-green-500";
       default:
-        return 0;
+        return "";
     }
-  });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const getCategoryColor = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category?.color || "#6b7280";
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category?.name || categoryId;
+  };
 
   return (
-    <div className="rounded-md border">
+    <div className="w-full overflow-auto">
       <Table>
         <TableHeader>
           <TableRow>
@@ -153,208 +81,95 @@ const TaskTable: React.FC<TaskTableProps> = ({
                 aria-label="Select all tasks"
               />
             </TableHead>
-            <TableHead
-              className="cursor-pointer"
-              onClick={() => handleSort("title")}
-            >
-              Task {getSortIcon("title")}
-            </TableHead>
-            <TableHead
-              className="cursor-pointer"
-              onClick={() => handleSort("category")}
-            >
-              Category {getSortIcon("category")}
-            </TableHead>
-            <TableHead
-              className="text-center cursor-pointer"
-              onClick={() => handleSort("priority")}
-            >
-              Priority {getSortIcon("priority")}
-            </TableHead>
-            <TableHead
-              className="text-right cursor-pointer"
-              onClick={() => handleSort("hourlyRate")}
-            >
-              Hourly Rate {getSortIcon("hourlyRate")}
-            </TableHead>
-            <TableHead
-              className="text-right cursor-pointer"
-              onClick={() => handleSort("estimatedHours")}
-            >
-              Hours {getSortIcon("estimatedHours")}
-            </TableHead>
-            <TableHead
-              className="text-right cursor-pointer"
-              onClick={() => handleSort("value")}
-            >
-              Value {getSortIcon("value")}
-            </TableHead>
-            <TableHead
-              className="text-center cursor-pointer"
-              onClick={() => handleSort("status")}
-            >
-              Status {getSortIcon("status")}
-            </TableHead>
-            <TableHead className="w-16">Actions</TableHead>
+            <TableHead>Task</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Rate</TableHead>
+            <TableHead>Est. Hours</TableHead>
+            <TableHead>Est. Value</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedTasks.length === 0 ? (
+          {tasks.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={9}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No tasks found. Add a new task to get started.
+              <TableCell colSpan={8} className="text-center py-4">
+                No tasks found. Create a new task to get started.
               </TableCell>
             </TableRow>
           ) : (
-            sortedTasks.map((task) => (
+            tasks.map((task) => (
               <TableRow
                 key={task.id}
-                className={task.completed ? "bg-muted/50" : ""}
+                className={task.completed ? "opacity-60 bg-gray-50" : ""}
               >
                 <TableCell>
                   <Checkbox
-                    checked={task.completed}
-                    onCheckedChange={(checked) => {
-                      if (checked && !task.completed) {
-                        import("@/lib/storage").then(async ({ updateTask }) => {
-                          try {
-                            const updated = await updateTask(task.id, {
-                              completed: true,
-                              completedAt: new Date().toISOString(),
-                            });
-                            if (updated) {
-                              window.dispatchEvent(
-                                new CustomEvent("task-updated"),
-                              );
-                              onComplete(task.id);
-                            }
-                          } catch (error) {
-                            console.error("Error completing task:", error);
-                          }
-                        });
-                      } else if (checked === false && task.completed) {
-                        import("@/lib/storage").then(async ({ updateTask }) => {
-                          try {
-                            const updated = await updateTask(task.id, {
-                              completed: false,
-                              completedAt: undefined,
-                            });
-                            if (updated) {
-                              window.dispatchEvent(
-                                new CustomEvent("task-updated"),
-                              );
-                            }
-                          } catch (error) {
-                            console.error("Error unchecking task:", error);
-                          }
-                        });
-                      }
-                    }}
+                    checked={selectedTasks.includes(task.id)}
+                    onCheckedChange={() => toggleTaskSelection(task.id)}
                     aria-label={`Select task ${task.title}`}
                   />
                 </TableCell>
+                <TableCell className="font-medium">{task.title}</TableCell>
                 <TableCell>
-                  <div className="font-medium">{task.title}</div>
-                  <div className="text-sm text-muted-foreground truncate max-w-[200px]">
-                    {task.description}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: getCategoryColor(task.category),
+                      }}
+                    ></div>
+                    {getCategoryName(task.category)}
                   </div>
                 </TableCell>
+                <TableCell>{formatCurrency(task.hourlyRate)}</TableCell>
+                <TableCell>{task.estimatedHours}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">
-                    {categories.find((cat) => cat.id === task.category)?.name ||
-                      "Unknown Category"}
-                  </Badge>
+                  {formatCurrency(task.hourlyRate * task.estimatedHours)}
                 </TableCell>
-                <TableCell className="text-center">
-                  <Badge
-                    variant={
-                      task.priority === "high"
-                        ? "destructive"
-                        : task.priority === "medium"
-                          ? "secondary"
-                          : "outline"
-                    }
-                  >
-                    {task.priority || "medium"}
-                  </Badge>
-                  {task.dueDate && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
-                    </div>
-                  )}
+                <TableCell className={getPriorityColor(task.priority)}>
+                  {task.priority || "Medium"}
                 </TableCell>
-                <TableCell className="text-right">${task.hourlyRate}</TableCell>
                 <TableCell className="text-right">
-                  {task.estimatedHours}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  ${calculateValue(task.hourlyRate, task.estimatedHours)}
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Badge variant={task.completed ? "success" : "secondary"}>
-                      {task.completed ? "Completed" : "Pending"}
-                    </Badge>
-                    {tasksInProgress.includes(task.id) && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="animate-pulse">
-                              <Clock className="h-4 w-4 text-blue-500" />
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Timer running</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                  <div className="flex justify-end gap-2">
+                    {!task.completed && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onStartTimer(task)}
+                        disabled={tasksInProgress.includes(task.id)}
+                        className={`h-8 w-8 ${tasksInProgress.includes(task.id) ? "bg-green-100" : ""}`}
+                      >
+                        <Play className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => onEdit(task)}
+                      className="h-8 w-8"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => onDelete(task.id)}
+                      className="h-8 w-8"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    {!task.completed && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onComplete(task.id)}
+                        className="h-8 w-8"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
                     )}
                   </div>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {!task.completed && (
-                        <>
-                          <DropdownMenuItem onClick={() => onComplete(task.id)}>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            <span>Mark as Complete</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              onStartTimer(task);
-                            }}
-                          >
-                            <Clock className="mr-2 h-4 w-4" />
-                            <span>
-                              {tasksInProgress.includes(task.id)
-                                ? "View Timer"
-                                : "Start Timer"}
-                            </span>
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                      <DropdownMenuItem onClick={() => onEdit(task)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        <span>Edit</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDelete(task.id)}>
-                        <Trash className="mr-2 h-4 w-4" />
-                        <span>Delete</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))

@@ -1,78 +1,70 @@
-import React from "react";
-import Header from "@/components/dashboard/Header";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserProfile from "@/components/profile/UserProfile";
+import { GoogleCalendarSettings } from "@/components/settings/GoogleCalendarSettings";
+import AISettings from "@/components/settings/AISettings";
+import { supabase } from "@/lib/supabase";
 
 const ProfilePage = () => {
+  const [activeTab, setActiveTab] = useState("profile");
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from("user_profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .single();
+
+          setUserProfile(data || { user_id: user.id });
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header
-        userAvatar="https://api.dicebear.com/7.x/avataaars/svg?seed=john"
-        onLogout={() => console.log("Logout clicked")}
-      />
+    <div className="min-h-screen bg-gradient-to-b from-background to-accent/30">
+      <div className="container mx-auto px-4 py-8">
+        <Card className="glass-card shadow-md border border-white/10">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold glow-text">
+              Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-3 glass bg-opacity-30 border border-white/10">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="calendar">Calendar Integration</TabsTrigger>
+                <TabsTrigger value="ai">AI Settings</TabsTrigger>
+              </TabsList>
 
-      <main className="container mx-auto px-4 py-8">
-        <UserProfile />
-      </main>
+              <TabsContent value="profile" className="mt-6">
+                {userProfile && <UserProfile initialData={userProfile} />}
+              </TabsContent>
 
-      <footer className="bg-white border-t border-gray-200 py-6 mt-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="rounded-full bg-primary p-1">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4 text-white"
-                >
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-              </div>
-              <span className="text-sm font-medium">
-                Mental Bank Task Manager
-              </span>
-            </div>
+              <TabsContent value="calendar" className="mt-6">
+                <GoogleCalendarSettings />
+              </TabsContent>
 
-            <div className="mt-4 md:mt-0">
-              <nav className="flex space-x-4">
-                <a
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  About
-                </a>
-                <a
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  Privacy
-                </a>
-                <a
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  Terms
-                </a>
-                <a
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  Contact
-                </a>
-              </nav>
-            </div>
-          </div>
-
-          <div className="mt-6 text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Mental Bank Task Manager. All
-            rights reserved.
-          </div>
-        </div>
-      </footer>
+              <TabsContent value="ai" className="mt-6">
+                <AISettings />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

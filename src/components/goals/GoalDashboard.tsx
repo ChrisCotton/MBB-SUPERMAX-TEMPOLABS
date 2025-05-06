@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GoalList from "./GoalList";
 import GoalForm from "./GoalForm";
 import GoalSummary from "./GoalSummary";
-import VisionBoard from "./VisionBoard";
+import VisionBoardContainer from "./VisionBoardContainer";
 import GoalTimeline from "./GoalTimeline";
 import GoalMilestoneList from "./GoalMilestoneList";
 
@@ -12,7 +12,7 @@ export default function GoalDashboard() {
   const [activeTab, setActiveTab] = useState("summary");
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-6">
+    <div className="w-full glass-card rounded-lg p-6">
       <Tabs
         defaultValue="summary"
         value={activeTab}
@@ -33,7 +33,19 @@ export default function GoalDashboard() {
         <TabsContent value="goals" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-1">
-              <GoalForm />
+              <GoalForm
+                onSubmit={async (goalData) => {
+                  try {
+                    const { addGoal } = await import("@/lib/goals");
+                    await addGoal(goalData);
+                    // Refresh goals list
+                    window.location.reload();
+                  } catch (error) {
+                    console.error("Error adding goal:", error);
+                  }
+                }}
+                onCancel={() => {}}
+              />
             </div>
             <div className="md:col-span-2">
               <GoalList />
@@ -50,7 +62,7 @@ export default function GoalDashboard() {
         </TabsContent>
 
         <TabsContent value="vision" className="space-y-4">
-          <VisionBoard />
+          <VisionBoardContainer />
         </TabsContent>
       </Tabs>
     </div>

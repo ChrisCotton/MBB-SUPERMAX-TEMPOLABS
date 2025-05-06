@@ -70,10 +70,10 @@ const LoginForm = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Sign In</CardTitle>
-        <CardDescription>
+    <Card className="w-full max-w-md mx-auto glass-card bg-gradient-glass">
+      <CardHeader className="border-b border-white/10">
+        <CardTitle className="text-2xl font-bold glow-text">Sign In</CardTitle>
+        <CardDescription className="text-foreground/70">
           Enter your credentials to access your account
         </CardDescription>
       </CardHeader>
@@ -130,6 +130,7 @@ const LoginForm = ({
             <Button
               type="button"
               variant="link"
+              className="text-primary hover:text-primary/80"
               className="px-0 font-normal"
               onClick={onForgotPasswordClick}
               disabled={isLoading}
@@ -137,18 +138,22 @@ const LoginForm = ({
               Forgot password?
             </Button>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full glass-button"
+              disabled={isLoading}
+            >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex justify-center border-t pt-4">
+      <CardFooter className="flex justify-center border-t border-white/10 pt-4">
         <div className="text-sm text-muted-foreground">
           Don't have an account?{" "}
           <Button
             variant="link"
-            className="p-0 font-normal"
+            className="p-0 font-normal text-primary hover:text-primary/80"
             onClick={onRegisterClick}
             disabled={isLoading}
           >

@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
@@ -51,6 +51,17 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Custom glassmorphism colors
+        glass: {
+          DEFAULT: "rgba(17, 25, 40, 0.75)",
+          light: "rgba(255, 255, 255, 0.1)",
+          dark: "rgba(2, 10, 27, 0.8)",
+          border: "rgba(255, 255, 255, 0.1)",
+        },
+        "blue-glow": {
+          DEFAULT: "rgba(56, 139, 253, 0.4)",
+          strong: "rgba(56, 139, 253, 0.8)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -66,12 +77,33 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-glow": {
+          "0%, 100%": {
+            opacity: 1,
+            boxShadow: "0 0 15px 2px rgba(56, 139, 253, 0.4)",
+          },
+          "50%": {
+            opacity: 0.8,
+            boxShadow: "0 0 25px 5px rgba(56, 139, 253, 0.6)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-glass":
+          "linear-gradient(135deg, rgba(56, 139, 253, 0.15), rgba(17, 25, 40, 0.2))",
+        "gradient-dark":
+          "linear-gradient(135deg, rgba(13, 17, 23, 0.95), rgba(17, 25, 40, 0.85))",
+      },
+      backdropBlur: {
+        xs: "2px",
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};

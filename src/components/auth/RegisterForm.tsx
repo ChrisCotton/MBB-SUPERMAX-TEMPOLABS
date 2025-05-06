@@ -82,9 +82,11 @@ const RegisterForm = ({
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto glass-card">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+        <CardTitle className="text-2xl font-bold glow-text">
+          Create Account
+        </CardTitle>
         <CardDescription>Sign up for a new Mental Bank account</CardDescription>
       </CardHeader>
       <CardContent>
@@ -168,7 +170,7 @@ const RegisterForm = ({
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full glass-button"
               disabled={isLoading || !!success}
             >
               {isLoading ? "Creating account..." : "Create Account"}
@@ -181,7 +183,7 @@ const RegisterForm = ({
           Already have an account?{" "}
           <Button
             variant="link"
-            className="p-0 font-normal"
+            className="p-0 font-normal text-primary hover:text-primary/80"
             onClick={onLoginClick}
             disabled={isLoading}
           >

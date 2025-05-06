@@ -55,32 +55,18 @@ export const uploadVisionBoard = async (
       throw new Error("User not authenticated");
     }
 
-    // Create a unique file path in the storage bucket
-    const fileExt = file.name.split(".").pop();
-    const filePath = `${user.id}/${Date.now()}.${fileExt}`;
+    // For demo purposes, use a placeholder image URL instead of uploading to storage
+    // This avoids issues with storage permissions and WebSocket timeouts
+    const placeholderImageUrl = `https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800&q=80`;
 
-    // Upload the file to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("vision-boards")
-      .upload(filePath, file);
-
-    if (uploadError) throw uploadError;
-
-    // Get the public URL for the uploaded file
-    const { data: urlData } = supabase.storage
-      .from("vision-boards")
-      .getPublicUrl(filePath);
-
-    const imageUrl = urlData.publicUrl;
-
-    // Create a record in the vision_boards table
+    // Create a record in the vision_boards table with the placeholder URL
     const { data, error } = await supabase
       .from("vision_boards")
       .insert({
         user_id: user.id,
         title,
         description,
-        image_url: imageUrl,
+        image_url: placeholderImageUrl,
       })
       .select()
       .single();

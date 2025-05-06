@@ -170,7 +170,7 @@ const JournalEntry = ({
   };
 
   return (
-    <Card className="w-full bg-white">
+    <Card className="w-full glass-card shadow-md border border-white/10">
       <CardHeader>
         <CardTitle>
           <input
@@ -178,7 +178,7 @@ const JournalEntry = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Journal Entry Title"
-            className="w-full border-none text-xl font-semibold focus:outline-none"
+            className="w-full border-none text-xl font-semibold focus:outline-none bg-transparent glass-input"
           />
         </CardTitle>
       </CardHeader>
@@ -187,19 +187,25 @@ const JournalEntry = ({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your thoughts here..."
-          className="min-h-[200px]"
+          className="min-h-[200px] glass-input"
         />
 
         {audioUrl && (
           <div className="mt-4">
-            <audio src={audioUrl} controls className="w-full" />
+            <audio
+              src={audioUrl}
+              controls
+              className="w-full glass-input rounded-md"
+            />
           </div>
         )}
 
         {transcription && (
           <div className="mt-2">
-            <h3 className="text-sm font-medium mb-1">Transcription</h3>
-            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+            <h3 className="text-sm font-medium mb-1 glow-text">
+              Transcription
+            </h3>
+            <div className="text-sm text-foreground/80 glass-card-inner p-3 rounded-md">
               {transcription}
             </div>
           </div>
@@ -220,12 +226,17 @@ const JournalEntry = ({
                 <Square className="mr-2 h-4 w-4" />
                 Stop Recording
               </Button>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-foreground/70">
                 {formatTime(recordingTime)}
               </span>
             </>
           ) : (
-            <Button variant="outline" size="sm" onClick={startRecording}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={startRecording}
+              className="glass-input hover:glow-border"
+            >
               <Mic className="mr-2 h-4 w-4" />
               Record Audio
             </Button>
@@ -233,11 +244,16 @@ const JournalEntry = ({
         </div>
         <div className="flex gap-2">
           {onCancel && (
-            <Button variant="outline" size="sm" onClick={onCancel}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCancel}
+              className="glass-input hover:glow-border"
+            >
               Cancel
             </Button>
           )}
-          <Button size="sm" onClick={handleSave}>
+          <Button size="sm" onClick={handleSave} className="glass-button">
             <Save className="mr-2 h-4 w-4" />
             Save Entry
           </Button>

@@ -39,9 +39,9 @@ const BalanceSummary = ({
     }
   };
   return (
-    <Card className="w-full bg-white shadow-md">
+    <Card className="w-full glass-card shadow-md bg-gradient-glass">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">
+        <CardTitle className="text-xl font-semibold glow-text">
           Mental Bank Balance
         </CardTitle>
       </CardHeader>
@@ -96,7 +96,7 @@ const BalanceSummary = ({
             </div>
 
             {isEditingTarget ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 glass-card-inner p-1 rounded-md">
                 <div className="relative flex-1">
                   <span className="absolute left-3 top-2.5 text-muted-foreground">
                     $
@@ -147,7 +147,10 @@ const BalanceSummary = ({
               </span>
               <span className="text-sm font-medium">{progressPercentage}%</span>
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+            <Progress
+              value={progressPercentage}
+              className="h-2 animate-pulse-glow glow-border"
+            />
             <div className="flex items-center text-sm text-muted-foreground">
               <TrendingUp className="h-3 w-3 mr-1 text-green-600" />
               <span>On track to reach your goal in 67 days</span>
@@ -156,7 +159,7 @@ const BalanceSummary = ({
         </div>
 
         {/* Additional Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-4 border-t">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-4 border-t border-white/10">
           <div className="flex flex-col">
             <span className="text-sm text-muted-foreground">
               Tasks Completed

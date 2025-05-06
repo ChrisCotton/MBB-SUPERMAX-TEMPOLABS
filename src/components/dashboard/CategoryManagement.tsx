@@ -122,15 +122,15 @@ const CategoryManagement = ({
   };
 
   return (
-    <Card className="w-full bg-white shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold">
+    <Card className="w-full glass-card shadow-sm">
+      <CardHeader className="border-b border-white/5">
+        <CardTitle className="text-xl font-semibold glow-text">
           Category Management
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-4 mb-6">
+          <TabsList className="grid w-full max-w-md grid-cols-4 mb-6 glass bg-opacity-30 border border-white/10">
             <TabsTrigger value="list">Categories</TabsTrigger>
             <TabsTrigger value="add">Add New</TabsTrigger>
             <TabsTrigger value="import">Import CSV</TabsTrigger>

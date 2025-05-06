@@ -508,10 +508,10 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
   };
 
   return (
-    <div className="w-full bg-white p-6 rounded-lg shadow-sm">
+    <div className="w-full glass-card p-6 rounded-lg shadow-sm">
       <div className="flex flex-col space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Task Management</h2>
+          <h2 className="text-2xl font-bold glow-text">Task Management</h2>
           <div className="flex gap-2">
             {showTimer ? (
               <Button
@@ -537,12 +537,12 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
               onOpenChange={setIsAddTaskDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
+                <Button className="flex items-center gap-2 glass-button">
                   <Plus className="h-4 w-4" />
                   Add New Task
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="glass-card border border-white/10 bg-opacity-95 backdrop-blur-xl">
                 <DialogHeader>
                   <DialogTitle>Add New Task</DialogTitle>
                 </DialogHeader>
@@ -645,8 +645,8 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
           )}
         </div>
 
-        <Card>
-          <CardHeader className="px-6 py-4">
+        <Card className="glass-card-inner">
+          <CardHeader className="px-6 py-4 border-b border-white/5">
             <Tabs
               defaultValue="all"
               value={activeTab}

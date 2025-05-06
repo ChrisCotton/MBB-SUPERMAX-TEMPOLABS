@@ -117,7 +117,10 @@ const GoalForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4 glass-card p-6 rounded-lg"
+      >
         <FormField
           control={form.control}
           name="title"
