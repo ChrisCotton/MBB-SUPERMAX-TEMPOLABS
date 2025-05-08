@@ -291,8 +291,8 @@ const TaskInsights = ({
             <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
             <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
             <Tooltip
-              formatter={(value, name) => {
-                if (name === "value")
+              formatter={(value: number | string, name: string) => {
+                if (name === "value" && typeof value === "number")
                   return [`$${value.toFixed(2)}`, "Value Generated"];
                 return [
                   value,
@@ -334,9 +334,14 @@ const TaskInsights = ({
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="period" />
-            <YAxis tickFormatter={(value) => `$${value}`} />
+            <YAxis tickFormatter={(value: number) => `$${value}`} />
             <Tooltip
-              formatter={(value) => [`$${value.toFixed(2)}`, "Value Generated"]}
+              formatter={(value: number | string) => {
+                if (typeof value === "number") {
+                  return [`$${value.toFixed(2)}`, "Value Generated"];
+                }
+                return [value, "Value Generated"];
+              }}
             />
             <Legend />
             <Area
@@ -400,7 +405,12 @@ const TaskInsights = ({
               ))}
             </Pie>
             <Tooltip
-              formatter={(value) => [`$${value.toFixed(2)}`, "Value Generated"]}
+              formatter={(value: number | string) => {
+                if (typeof value === "number") {
+                  return [`$${value.toFixed(2)}`, "Value Generated"];
+                }
+                return [value, "Value Generated"];
+              }}
             />
             <Legend />
           </PieChart>
@@ -425,8 +435,8 @@ const TaskInsights = ({
             <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
             <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
             <Tooltip
-              formatter={(value, name) => {
-                if (name === "value")
+              formatter={(value: number | string, name: string) => {
+                if (name === "value" && typeof value === "number")
                   return [`$${value.toFixed(2)}`, "Value Generated"];
                 return [value, "Tasks Completed"];
               }}
@@ -458,10 +468,10 @@ const TaskInsights = ({
 
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-white shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">Tasks Completed</div>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold glow-text">
               {stats.completedTasksCount}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
@@ -470,12 +480,12 @@ const TaskInsights = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">
               Total Value Generated
             </div>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold glow-text">
               ${stats.totalValue.toFixed(2)}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
@@ -484,12 +494,12 @@ const TaskInsights = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm">
+        <Card className="glass-card">
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">
               Avg. Value Per Task
             </div>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold glow-text">
               ${stats.avgValuePerTask.toFixed(2)}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
@@ -503,14 +513,14 @@ const TaskInsights = ({
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-white shadow-sm">
+      <Card className="w-full glass-card">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">Task Insights</CardTitle>
+          <CardTitle className="text-xl font-semibold glow-text">Task Insights</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-muted/20 rounded w-1/4"></div>
+            <div className="h-64 bg-muted/20 rounded"></div>
           </div>
         </CardContent>
       </Card>
@@ -518,9 +528,9 @@ const TaskInsights = ({
   }
 
   return (
-    <Card className="w-full bg-white shadow-sm">
+    <Card className="w-full glass-card">
       <CardHeader>
-        <CardTitle className="text-xl font-semibold">Task Insights</CardTitle>
+        <CardTitle className="text-xl font-semibold glow-text">Task Insights</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col space-y-6">
@@ -529,21 +539,21 @@ const TaskInsights = ({
             <div className="flex space-x-2">
               <Badge
                 variant={timeFrame === "daily" ? "default" : "outline"}
-                className="cursor-pointer"
+                className="cursor-pointer glass"
                 onClick={() => setTimeFrame("daily")}
               >
                 Daily
               </Badge>
               <Badge
                 variant={timeFrame === "weekly" ? "default" : "outline"}
-                className="cursor-pointer"
+                className="cursor-pointer glass"
                 onClick={() => setTimeFrame("weekly")}
               >
                 Weekly
               </Badge>
               <Badge
                 variant={timeFrame === "monthly" ? "default" : "outline"}
-                className="cursor-pointer"
+                className="cursor-pointer glass"
                 onClick={() => setTimeFrame("monthly")}
               >
                 Monthly
@@ -560,35 +570,35 @@ const TaskInsights = ({
 
           {/* Chart tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-              <TabsTrigger value="productivity">Productivity</TabsTrigger>
-              <TabsTrigger value="value">Value Generation</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
-              <TabsTrigger value="timeOfDay">Time of Day</TabsTrigger>
+            <TabsList className="glass">
+              <TabsTrigger value="productivity" className="glass-button">Productivity</TabsTrigger>
+              <TabsTrigger value="value" className="glass-button">Value</TabsTrigger>
+              <TabsTrigger value="categories" className="glass-button">Categories</TabsTrigger>
+              <TabsTrigger value="timeOfDay" className="glass-button">Time of Day</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="productivity" className="mt-4">
+            <TabsContent value="productivity" className="glass-card-inner p-4 mt-4">
               <h3 className="text-lg font-medium mb-4">
                 Productivity Patterns
               </h3>
               {renderProductivityChart()}
             </TabsContent>
 
-            <TabsContent value="value" className="mt-4">
+            <TabsContent value="value" className="glass-card-inner p-4 mt-4">
               <h3 className="text-lg font-medium mb-4">
                 Value Generation Over Time
               </h3>
               {renderValueGenerationChart()}
             </TabsContent>
 
-            <TabsContent value="categories" className="mt-4">
+            <TabsContent value="categories" className="glass-card-inner p-4 mt-4">
               <h3 className="text-lg font-medium mb-4">
                 Value Distribution by Category
               </h3>
               {renderCategoryDistributionChart()}
             </TabsContent>
 
-            <TabsContent value="timeOfDay" className="mt-4">
+            <TabsContent value="timeOfDay" className="glass-card-inner p-4 mt-4">
               <h3 className="text-lg font-medium mb-4">
                 Productivity by Time of Day
               </h3>

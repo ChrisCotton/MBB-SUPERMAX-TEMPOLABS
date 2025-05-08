@@ -230,16 +230,16 @@ const TaskTimer = ({
   }
 
   return (
-    <Card className="w-full bg-white shadow-sm">
+    <Card className="w-full glass-card">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-lg font-medium">Task Timer</CardTitle>
+            <CardTitle className="text-lg font-medium glow-text">Task Timer</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               Track time spent on this task
             </p>
           </div>
-          <Badge variant="outline" className="ml-2">
+          <Badge variant="outline" className="ml-2 glass">
             {task.completed
               ? "Completed"
               : task.inProgress
@@ -250,24 +250,24 @@ const TaskTimer = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="bg-muted/50 p-4 rounded-md">
-            <h3 className="font-medium text-lg mb-1">{task.title}</h3>
+          <div className="glass-card-inner p-4 rounded-md">
+            <h3 className="font-medium text-lg mb-1 glow-text">{task.title}</h3>
             <p className="text-sm text-muted-foreground mb-2">
               {task.description || "No description"}
             </p>
             <div className="flex flex-wrap gap-2 text-sm">
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="glass">
                 Estimated: {task.estimatedHours} hrs
               </Badge>
               {task.actualTimeSpent !== undefined && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="glass">
                   Logged: {task.actualTimeSpent.toFixed(2)} hrs
                 </Badge>
               )}
-              <Badge variant="outline">${task.hourlyRate}/hr</Badge>
+              <Badge variant="outline" className="glass">${task.hourlyRate}/hr</Badge>
               {task.dailyBalance !== undefined && (
-                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm font-medium text-green-800">
+                <div className="mt-2 p-2 glass-card-inner rounded-md">
+                  <p className="text-sm font-medium glow-text">
                     Today's Balance For This Task: $
                     {task.dailyBalance.toFixed(2)}
                   </p>

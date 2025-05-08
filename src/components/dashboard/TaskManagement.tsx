@@ -50,7 +50,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
       estimatedHours: 3,
       completed: false,
       createdAt: "2023-06-15T10:30:00Z",
-      priority: "high",
+      priority: "high" as const,
       dueDate: "2023-06-20",
     },
     {
@@ -62,7 +62,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
       estimatedHours: 0.5,
       completed: true,
       createdAt: "2023-06-15T08:00:00Z",
-      priority: "medium",
+      priority: "medium" as const,
       completedAt: "2023-06-15T08:30:00Z",
     },
     {
@@ -74,7 +74,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
       estimatedHours: 2,
       completed: false,
       createdAt: "2023-06-16T09:15:00Z",
-      priority: "medium",
+      priority: "medium" as const,
       dueDate: "2023-06-18",
     },
   ];
@@ -517,7 +517,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
               <Button
                 variant="outline"
                 onClick={() => setShowTimer(false)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 glass-button"
               >
                 <Clock className="h-4 w-4" />
                 Hide Timer
@@ -526,7 +526,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
               <Button
                 variant="outline"
                 onClick={() => setShowTimer(true)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 glass-button"
               >
                 <Clock className="h-4 w-4" />
                 Show Timer
@@ -563,7 +563,7 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search tasks..."
-                  className="pl-8"
+                  className="pl-8 glass-input"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -574,13 +574,13 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 glass-button"
                     >
                       <Filter className="h-4 w-4" />
                       Filter & Sort
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent className="glass-card border border-white/10">
                     <DropdownMenuLabel>Sort By</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setSortBy("date")}>
@@ -651,11 +651,12 @@ const TaskManagement = ({ tasks: initialTasks }: TaskManagementProps = {}) => {
               defaultValue="all"
               value={activeTab}
               onValueChange={setActiveTab}
+              className="glass"
             >
-              <TabsList>
-                <TabsTrigger value="all">All Tasks</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsList className="glass">
+                <TabsTrigger value="all" className="glass-button">All Tasks</TabsTrigger>
+                <TabsTrigger value="pending" className="glass-button">Pending</TabsTrigger>
+                <TabsTrigger value="completed" className="glass-button">Completed</TabsTrigger>
               </TabsList>
             </Tabs>
           </CardHeader>

@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Play, Edit, Trash2, CheckCircle } from "lucide-react";
+import { Play, Edit, Trash2, CheckCircle, Pencil, Clock, Check } from "lucide-react";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -59,7 +59,7 @@ const TaskTable = ({
 
   const getCategoryColor = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return category?.color || "#6b7280";
+    return category?.name || "#6b7280";
   };
 
   const getCategoryName = (categoryId: string) => {
@@ -68,24 +68,22 @@ const TaskTable = ({
   };
 
   return (
-    <div className="w-full overflow-auto">
+    <div className="glass-card-inner">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-12">
+          <TableRow className="glass">
+            <TableHead className="w-[50px]">
               <Checkbox
-                checked={
-                  selectedTasks.length === tasks.length && tasks.length > 0
-                }
+                checked={selectedTasks.length === tasks.length}
                 onCheckedChange={toggleAllTasks}
                 aria-label="Select all tasks"
               />
             </TableHead>
-            <TableHead>Task</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Rate</TableHead>
             <TableHead>Est. Hours</TableHead>
-            <TableHead>Est. Value</TableHead>
+            <TableHead>Value</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -93,7 +91,7 @@ const TaskTable = ({
         <TableBody>
           {tasks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4 text-muted-foreground">
                 No tasks found. Create a new task to get started.
               </TableCell>
             </TableRow>
@@ -101,7 +99,7 @@ const TaskTable = ({
             tasks.map((task) => (
               <TableRow
                 key={task.id}
-                className={task.completed ? "opacity-60 bg-gray-50" : ""}
+                className={`${task.completed ? "opacity-60" : ""} glass-card-inner`}
               >
                 <TableCell>
                   <Checkbox
@@ -110,7 +108,7 @@ const TaskTable = ({
                     aria-label={`Select task ${task.title}`}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{task.title}</TableCell>
+                <TableCell className="font-medium glow-text">{task.title}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div
@@ -124,49 +122,46 @@ const TaskTable = ({
                 </TableCell>
                 <TableCell>{formatCurrency(task.hourlyRate)}</TableCell>
                 <TableCell>{task.estimatedHours}</TableCell>
-                <TableCell>
-                  {formatCurrency(task.hourlyRate * task.estimatedHours)}
-                </TableCell>
-                <TableCell className={getPriorityColor(task.priority)}>
+                <TableCell>{formatCurrency(task.hourlyRate * task.estimatedHours)}</TableCell>
+                <TableCell className={`${getPriorityColor(task.priority)} glass`}>
                   {task.priority || "Medium"}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    {!task.completed && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => onStartTimer(task)}
-                        disabled={tasksInProgress.includes(task.id)}
-                        className={`h-8 w-8 ${tasksInProgress.includes(task.id) ? "bg-green-100" : ""}`}
-                      >
-                        <Play className="h-4 w-4" />
-                      </Button>
-                    )}
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={() => onEdit(task)}
-                      className="h-8 w-8"
+                      className="glass-button"
                     >
-                      <Edit className="h-4 w-4" />
+                      <Pencil className="h-4 w-4" />
                     </Button>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={() => onDelete(task.id)}
-                      className="h-8 w-8"
+                      className="glass-button"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                     {!task.completed && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon"
                         onClick={() => onComplete(task.id)}
-                        className="h-8 w-8"
+                        className="glass-button"
                       >
-                        <CheckCircle className="h-4 w-4" />
+                        <Check className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {!task.completed && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onStartTimer(task)}
+                        className="glass-button"
+                      >
+                        <Clock className="h-4 w-4" />
                       </Button>
                     )}
                   </div>
