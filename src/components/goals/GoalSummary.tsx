@@ -88,7 +88,7 @@ const GoalSummary = ({ onViewAllClick }: GoalSummaryProps) => {
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-white shadow-md">
+      <Card className="w-full glass-card shadow-md border border-white/10">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">Goal Summary</CardTitle>
         </CardHeader>
@@ -106,7 +106,7 @@ const GoalSummary = ({ onViewAllClick }: GoalSummaryProps) => {
   const upcomingGoals = getUpcomingGoals();
 
   return (
-    <Card className="w-full bg-white shadow-md">
+    <Card className="w-full glass-card shadow-md border border-white/10">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-xl font-semibold">Goal Summary</CardTitle>
         <Button variant="ghost" size="sm" onClick={onViewAllClick}>
@@ -124,7 +124,10 @@ const GoalSummary = ({ onViewAllClick }: GoalSummaryProps) => {
                 const timeFrameGoals = getGoalsByTimeFrame(timeFrame);
 
                 return (
-                  <Card key={timeFrame} className="overflow-hidden">
+                  <Card
+                    key={timeFrame}
+                    className="overflow-hidden glass-card-inner border border-white/10"
+                  >
                     <div
                       className={`h-1 ${
                         timeFrame === "weekly"
@@ -181,7 +184,10 @@ const GoalSummary = ({ onViewAllClick }: GoalSummaryProps) => {
             {upcomingGoals.length > 0 ? (
               <div className="space-y-2">
                 {upcomingGoals.map((goal) => (
-                  <Card key={goal.id} className="overflow-hidden">
+                  <Card
+                    key={goal.id}
+                    className="overflow-hidden glass-card-inner border border-white/10"
+                  >
                     <CardContent className="p-3">
                       <div className="flex justify-between items-start">
                         <div>
@@ -208,7 +214,7 @@ const GoalSummary = ({ onViewAllClick }: GoalSummaryProps) => {
                 ))}
               </div>
             ) : (
-              <Card>
+              <Card className="glass-card-inner border border-white/10">
                 <CardContent className="p-4 text-center text-gray-500">
                   <p className="text-sm">No goals due this week.</p>
                 </CardContent>

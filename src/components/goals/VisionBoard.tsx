@@ -242,7 +242,7 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
   };
 
   return (
-    <div className="bg-background p-4 rounded-lg">
+    <div className="bg-transparent p-4 rounded-lg">
       <Card className="glass-card shadow-md border border-white/10">
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-6">
@@ -403,7 +403,7 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
 
               {/* Add new item button as a card */}
               <div
-                className="aspect-square bg-accent/20 rounded-lg flex flex-col items-center justify-center border border-white/10 cursor-pointer hover:bg-accent/30 transition-colors"
+                className="aspect-square glass-card-inner rounded-lg flex flex-col items-center justify-center border border-white/10 cursor-pointer hover:bg-white/5 transition-colors"
                 onClick={() => setIsAddingItem(true)}
               >
                 <PlusCircle className="h-12 w-12 text-muted-foreground mb-2" />

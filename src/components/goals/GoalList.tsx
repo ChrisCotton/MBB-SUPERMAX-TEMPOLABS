@@ -96,7 +96,10 @@ export default function GoalList() {
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Your Goals</h2>
       {goals.map((goal) => (
-        <Card key={goal.id} className="overflow-hidden">
+        <Card
+          key={goal.id}
+          className="overflow-hidden glass-card-inner border border-white/10"
+        >
           <CardContent className="p-4">
             <div className="flex justify-between items-start">
               <div>

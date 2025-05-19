@@ -14,7 +14,7 @@ interface GoalTimelineProps {
 
 function GoalTimeline({ goals = [] }: GoalTimelineProps) {
   return (
-    <Card className="w-full glass-card">
+    <Card className="w-full glass-card shadow-md border border-white/10">
       <CardHeader>
         <CardTitle>Goal Timeline</CardTitle>
       </CardHeader>

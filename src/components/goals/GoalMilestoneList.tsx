@@ -105,7 +105,7 @@ export default function GoalMilestoneList() {
 
   if (error) {
     return (
-      <Card>
+      <Card className="glass-card shadow-md border border-white/10">
         <CardHeader>
           <CardTitle>Milestones</CardTitle>
           <CardDescription>Error loading milestones</CardDescription>
@@ -119,7 +119,7 @@ export default function GoalMilestoneList() {
 
   if (milestones.length === 0) {
     return (
-      <Card>
+      <Card className="glass-card shadow-md border border-white/10">
         <CardHeader>
           <CardTitle>Milestones</CardTitle>
           <CardDescription>Track progress toward your goals</CardDescription>
@@ -139,7 +139,10 @@ export default function GoalMilestoneList() {
       <h2 className="text-2xl font-bold">Goal Milestones</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {milestones.map((milestone) => (
-          <Card key={milestone.id} className="overflow-hidden">
+          <Card
+            key={milestone.id}
+            className="overflow-hidden glass-card-inner border border-white/10"
+          >
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg">{milestone.title}</CardTitle>

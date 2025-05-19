@@ -150,7 +150,7 @@ const VisionBoardContainer = () => {
         <h2 className="text-2xl font-bold">Vision Boards</h2>
         <Button
           onClick={createNewVisionBoard}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 glass-button"
         >
           <Plus size={16} />
           New Board
@@ -162,14 +162,14 @@ const VisionBoardContainer = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       ) : visionBoards.length === 0 ? (
-        <Card>
+        <Card className="glass-card shadow-md border border-white/10">
           <CardContent className="p-6 text-center">
             <p className="text-muted-foreground mb-4">
               You don't have any vision boards yet.
             </p>
             <Button
               onClick={createNewVisionBoard}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 glass-button"
             >
               <Plus size={16} />
               Create Your First Vision Board
@@ -184,7 +184,7 @@ const VisionBoardContainer = () => {
                 <Button
                   variant={selectedBoard === board.id ? "default" : "outline"}
                   onClick={() => setSelectedBoard(board.id)}
-                  className="pr-8"
+                  className="pr-8 glass-button"
                 >
                   {board.title}
                 </Button>
