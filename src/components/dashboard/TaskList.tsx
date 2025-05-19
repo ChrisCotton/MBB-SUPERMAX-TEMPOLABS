@@ -116,7 +116,7 @@ const TaskList = ({
   };
 
   return (
-    <Card className="w-full bg-white shadow-sm">
+    <Card className="w-full glass-card-inner shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">Tasks</CardTitle>
       </CardHeader>

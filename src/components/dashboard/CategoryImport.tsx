@@ -192,7 +192,7 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white">
+    <Card className="w-full max-w-md mx-auto glass-card-inner p-6 shadow-md border border-white/10">
       <CardHeader>
         <CardTitle>Import Categories from CSV</CardTitle>
         <CardDescription>
@@ -201,7 +201,7 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div
-          className="border-2 border-dashed rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+          className="border-2 border-dashed border-white/10 rounded-lg p-6 text-center cursor-pointer hover:bg-white/5 transition-colors bg-transparent"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
@@ -213,16 +213,16 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
             onChange={handleFileChange}
             ref={fileInputRef}
           />
-          <Upload className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+          <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
           <p className="text-sm font-medium mb-1">
             {file ? file.name : "Drag and drop your CSV file here"}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {file
               ? `${(file.size / 1024).toFixed(2)} KB`
               : "or click to browse"}
           </p>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             CSV format: First column for category name, second column for hourly
             rate
           </p>
@@ -233,7 +233,7 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
             variant="outline"
             size="sm"
             onClick={downloadSampleCSV}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 glass-button"
           >
             <Download className="h-4 w-4" />
             Download Sample CSV
@@ -241,7 +241,10 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
         </div>
 
         {error && (
-          <Alert variant="destructive">
+          <Alert
+            variant="destructive"
+            className="glass-card-inner border-red-500/50"
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription className="whitespace-pre-line">
@@ -251,10 +254,13 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
         )}
 
         {success && (
-          <Alert variant="success" className="bg-green-50 border-green-200">
-            <Check className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">Success</AlertTitle>
-            <AlertDescription className="text-green-700">
+          <Alert
+            variant="success"
+            className="glass-card-inner border-green-500/50"
+          >
+            <Check className="h-4 w-4 text-green-500" />
+            <AlertTitle className="text-green-500">Success</AlertTitle>
+            <AlertDescription className="text-green-400">
               {success}
             </AlertDescription>
           </Alert>
@@ -265,25 +271,25 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
             <h3 className="text-sm font-medium mb-2">
               Preview ({preview.length} categories)
             </h3>
-            <div className="max-h-40 overflow-y-auto border rounded-md">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="max-h-40 overflow-y-auto border border-white/10 rounded-md">
+              <table className="min-w-full divide-y divide-white/10">
+                <thead className="bg-transparent">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Category Name
                     </th>
-                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Hourly Rate
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-transparent divide-y divide-white/10">
                   {preview.map((category, index) => (
-                    <tr key={index}>
-                      <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={index} className="bg-transparent hover:bg-white/5">
+                      <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
                         {category.name}
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 text-right">
+                      <td className="px-3 py-2 whitespace-nowrap text-sm text-muted-foreground text-right">
                         ${category.hourlyRate.toFixed(2)}
                       </td>
                     </tr>
@@ -308,6 +314,7 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
               fileInputRef.current.value = "";
             }
           }}
+          className="glass-button"
         >
           Cancel
         </Button>
@@ -315,6 +322,7 @@ const CategoryImport = ({ onImport }: CategoryImportProps) => {
           type="button"
           disabled={preview.length === 0}
           onClick={handleImport}
+          className="glass-button"
         >
           <FileText className="mr-2 h-4 w-4" />
           Import Categories

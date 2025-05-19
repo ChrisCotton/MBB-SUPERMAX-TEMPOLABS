@@ -66,7 +66,7 @@ const CategoryForm = ({
   };
 
   return (
-    <Card className="w-full max-w-md bg-white">
+    <Card className="w-full max-w-md glass-card-inner p-6 shadow-md border border-white/10">
       <CardHeader>
         <CardTitle>
           {category.id ? "Edit Category" : "Create New Category"}
@@ -92,6 +92,7 @@ const CategoryForm = ({
                   <FormControl>
                     <Input
                       placeholder="e.g., Consulting, Writing, Development"
+                      className="glass-input"
                       {...field}
                     />
                   </FormControl>
@@ -117,7 +118,7 @@ const CategoryForm = ({
                         step="0.01"
                         min="0"
                         placeholder="0.00"
-                        className="pl-9"
+                        className="pl-9 glass-input"
                         {...field}
                       />
                     </div>
@@ -131,11 +132,16 @@ const CategoryForm = ({
             />
 
             <CardFooter className="flex justify-between px-0">
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                className="glass-button"
+              >
                 <X className="mr-2 h-4 w-4" />
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="glass-button">
                 <Save className="mr-2 h-4 w-4" />
                 {category.id ? "Update" : "Create"} Category
               </Button>

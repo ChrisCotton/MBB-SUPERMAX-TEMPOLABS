@@ -150,7 +150,7 @@ const ProgressCharts = ({
   };
 
   return (
-    <Card className="w-full bg-white shadow-sm">
+    <Card className="w-full glass-card shadow-sm border border-white/10">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           Progress Tracking
@@ -163,7 +163,7 @@ const ProgressCharts = ({
           onValueChange={setActiveTab}
         >
           <div className="flex justify-between items-center mb-6">
-            <TabsList>
+            <TabsList className="bg-transparent border border-white/10">
               <TabsTrigger value="daily">Daily</TabsTrigger>
               <TabsTrigger value="weekly">Weekly</TabsTrigger>
               <TabsTrigger value="monthly">Monthly</TabsTrigger>
@@ -178,7 +178,7 @@ const ProgressCharts = ({
 
           {renderDateRangeSelector()}
 
-          <TabsContent value="daily" className="space-y-4">
+          <TabsContent value="daily" className="space-y-4 bg-transparent">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -215,6 +215,10 @@ const ProgressCharts = ({
                     labelFormatter={(date) =>
                       format(new Date(date), "MMMM d, yyyy")
                     }
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
                   />
                   <Area
                     type="monotone"
@@ -244,6 +248,10 @@ const ProgressCharts = ({
                     labelFormatter={(date) =>
                       format(new Date(date), "MMMM d, yyyy")
                     }
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
                   />
                   <Legend />
                   <Bar dataKey="tasks" fill="#82ca9d" name="Completed Tasks" />
@@ -252,7 +260,7 @@ const ProgressCharts = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="weekly" className="space-y-4">
+          <TabsContent value="weekly" className="space-y-4 bg-transparent">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -280,6 +288,10 @@ const ProgressCharts = ({
                   <YAxis tickFormatter={formatCurrency} />
                   <Tooltip
                     formatter={(value: number) => formatCurrency(value)}
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
                   />
                   <Area
                     type="monotone"
@@ -302,7 +314,12 @@ const ProgressCharts = ({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="week" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
                   <Legend />
                   <Bar dataKey="tasks" fill="#82ca9d" name="Completed Tasks" />
                 </BarChart>
@@ -310,7 +327,7 @@ const ProgressCharts = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="monthly" className="space-y-4">
+          <TabsContent value="monthly" className="space-y-4 bg-transparent">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
@@ -338,6 +355,10 @@ const ProgressCharts = ({
                   <YAxis tickFormatter={formatCurrency} />
                   <Tooltip
                     formatter={(value: number) => formatCurrency(value)}
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
                   />
                   <Area
                     type="monotone"
@@ -360,7 +381,12 @@ const ProgressCharts = ({
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(15, 23, 42, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                  />
                   <Legend />
                   <Bar dataKey="tasks" fill="#82ca9d" name="Completed Tasks" />
                 </BarChart>
@@ -380,7 +406,7 @@ const ProgressCharts = ({
                     );
                   }
                 }}
-                className="rounded-md border shadow p-3 bg-white"
+                className="rounded-md border border-white/10 shadow p-3 glass-card-inner"
               />
             </div>
           </TabsContent>

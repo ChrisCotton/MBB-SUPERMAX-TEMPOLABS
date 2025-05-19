@@ -68,7 +68,7 @@ const CategoryList = ({
   };
 
   return (
-    <Card className="w-full bg-white">
+    <Card className="w-full glass-card-inner">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Categories</CardTitle>
         <Dialog>
@@ -101,10 +101,10 @@ const CategoryList = ({
         </Dialog>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border border-white/10 bg-transparent">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-transparent hover:bg-white/5">
                 <TableHead
                   className="cursor-pointer"
                   onClick={() => {
@@ -143,17 +143,20 @@ const CategoryList = ({
             </TableHeader>
             <TableBody>
               {categories.length === 0 ? (
-                <TableRow>
+                <TableRow className="bg-transparent hover:bg-white/5">
                   <TableCell
                     colSpan={4}
-                    className="text-center py-6 text-muted-foreground"
+                    className="text-center py-6 text-muted-foreground bg-transparent"
                   >
                     No categories found. Add your first category to get started.
                   </TableCell>
                 </TableRow>
               ) : (
                 categories.map((category) => (
-                  <TableRow key={category.id}>
+                  <TableRow
+                    key={category.id}
+                    className="bg-transparent hover:bg-white/5"
+                  >
                     <TableCell className="font-medium">
                       {category.name}
                     </TableCell>

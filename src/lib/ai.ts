@@ -1,12 +1,12 @@
 import { supabase } from "./supabase";
 
 // AI service configuration
-interface AIConfig {
+type AIConfig = {
   apiKey: string;
   provider: "openai" | "azure" | "anthropic" | "custom";
   endpoint?: string;
   model?: string;
-}
+};
 
 // Get AI configuration from environment or storage
 export const getAIConfig = async (): Promise<AIConfig | null> => {

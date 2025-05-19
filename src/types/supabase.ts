@@ -402,6 +402,7 @@ export type Database = {
           created_at: string
           daily_goal: number | null
           dark_mode: boolean | null
+          display_name: string | null
           email: string | null
           email_notifications: boolean | null
           first_name: string | null
@@ -425,6 +426,7 @@ export type Database = {
           created_at?: string
           daily_goal?: number | null
           dark_mode?: boolean | null
+          display_name?: string | null
           email?: string | null
           email_notifications?: boolean | null
           first_name?: string | null
@@ -448,6 +450,7 @@ export type Database = {
           created_at?: string
           daily_goal?: number | null
           dark_mode?: boolean | null
+          display_name?: string | null
           email?: string | null
           email_notifications?: boolean | null
           first_name?: string | null

@@ -43,20 +43,22 @@ const JournalEntry = ({
   onSave,
   onCancel,
 }: JournalEntryProps) => {
-  const [title, setTitle] = useState(initialData?.title || initialTitle);
+  const [title, setTitle] = useState(initialData?.title || initialTitle || "");
   const [content, setContent] = useState(
     initialData?.content || initialContent,
   );
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState(
-    initialData?.audioUrl || initialAudioUrl,
+    initialData?.audioUrl || initialAudioUrl || "",
   );
   const [transcription, setTranscription] = useState(
     initialData?.transcription || initialTranscription || "",
   );
   const [recordingTime, setRecordingTime] = useState(0);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [date, setDate] = useState(initialDate);
+  const [date, setDate] = useState(
+    initialDate instanceof Date ? initialDate : new Date(),
+  );
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);

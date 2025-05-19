@@ -10,7 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Play, Edit, Trash2, CheckCircle, Pencil, Clock, Check } from "lucide-react";
+import {
+  Play,
+  Edit,
+  Trash2,
+  CheckCircle,
+  Pencil,
+  Clock,
+  Check,
+} from "lucide-react";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -91,7 +99,10 @@ const TaskTable = ({
         <TableBody>
           {tasks.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-4 text-muted-foreground">
+              <TableCell
+                colSpan={8}
+                className="text-center py-4 text-muted-foreground"
+              >
                 No tasks found. Create a new task to get started.
               </TableCell>
             </TableRow>
@@ -99,7 +110,7 @@ const TaskTable = ({
             tasks.map((task) => (
               <TableRow
                 key={task.id}
-                className={`${task.completed ? "opacity-60" : ""} glass-card-inner`}
+                className={`${task.completed ? "opacity-60" : ""} glass-card-inner bg-transparent`}
               >
                 <TableCell>
                   <Checkbox
@@ -108,7 +119,9 @@ const TaskTable = ({
                     aria-label={`Select task ${task.title}`}
                   />
                 </TableCell>
-                <TableCell className="font-medium glow-text">{task.title}</TableCell>
+                <TableCell className="font-medium glow-text">
+                  {task.title}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div
@@ -122,8 +135,12 @@ const TaskTable = ({
                 </TableCell>
                 <TableCell>{formatCurrency(task.hourlyRate)}</TableCell>
                 <TableCell>{task.estimatedHours}</TableCell>
-                <TableCell>{formatCurrency(task.hourlyRate * task.estimatedHours)}</TableCell>
-                <TableCell className={`${getPriorityColor(task.priority)} glass`}>
+                <TableCell>
+                  {formatCurrency(task.hourlyRate * task.estimatedHours)}
+                </TableCell>
+                <TableCell
+                  className={`${getPriorityColor(task.priority)} glass`}
+                >
                   {task.priority || "Medium"}
                 </TableCell>
                 <TableCell className="text-right">

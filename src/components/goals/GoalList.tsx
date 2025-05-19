@@ -83,7 +83,7 @@ export default function GoalList() {
 
   if (goals.length === 0) {
     return (
-      <div className="text-center py-8 bg-white rounded-lg shadow">
+      <div className="text-center py-8 glass-card-inner rounded-lg shadow border border-white/10">
         <h3 className="text-lg font-medium text-gray-700">No goals yet</h3>
         <p className="mt-2 text-gray-500">
           Create your first goal to get started

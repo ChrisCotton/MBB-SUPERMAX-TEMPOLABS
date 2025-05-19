@@ -39,7 +39,6 @@ export default function GoalMilestoneList() {
         const { data: goalMilestones, error } = await supabase
           .from("goal_milestones")
           .select("*")
-          .eq("user_id", user.user.id)
           .order("due_date", { ascending: true });
 
         if (error) throw error;

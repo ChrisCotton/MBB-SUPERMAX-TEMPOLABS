@@ -15,7 +15,7 @@ export const signUp = async (email: string, password: string) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${window.location.origin}`,
+      emailRedirectTo: window.location.origin,
       data: {
         email_confirmed: true, // This bypasses email confirmation for testing
       },

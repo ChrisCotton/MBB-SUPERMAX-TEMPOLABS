@@ -130,7 +130,7 @@ const CategoryManagement = ({
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-4 mb-6 glass bg-opacity-30 border border-white/10">
+          <TabsList className="grid w-full max-w-md grid-cols-4 mb-6 bg-transparent border border-white/10">
             <TabsTrigger value="list">Categories</TabsTrigger>
             <TabsTrigger value="add">Add New</TabsTrigger>
             <TabsTrigger value="import">Import CSV</TabsTrigger>
@@ -139,7 +139,7 @@ const CategoryManagement = ({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="list" className="space-y-4">
+          <TabsContent value="list" className="space-y-4 bg-transparent">
             <CategoryList
               categories={categories}
               onEdit={handleEditCategory}
@@ -148,7 +148,7 @@ const CategoryManagement = ({
             />
           </TabsContent>
 
-          <TabsContent value="add">
+          <TabsContent value="add" className="bg-transparent">
             <div className="flex justify-center">
               <CategoryForm
                 onSubmit={handleAddCategory}
@@ -157,7 +157,7 @@ const CategoryManagement = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="import">
+          <TabsContent value="import" className="bg-transparent">
             <div className="flex justify-center">
               <CategoryImport
                 onImport={(importedCategories) => {
@@ -178,7 +178,7 @@ const CategoryManagement = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="edit">
+          <TabsContent value="edit" className="bg-transparent">
             {selectedCategory && (
               <div className="flex justify-center">
                 <CategoryForm

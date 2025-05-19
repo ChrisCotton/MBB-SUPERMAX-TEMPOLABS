@@ -236,23 +236,23 @@ const MentalBankGrowth = ({
       const milestone = milestones.find((m) => m.date === label);
 
       return (
-        <div className="bg-white p-3 border rounded shadow-md">
+        <div className="glass-card-inner p-3 border border-white/10 rounded shadow-md">
           <p className="text-sm font-medium">
             {format(parseISO(label), "MMM d, yyyy")}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-foreground/80">
             Balance:{" "}
             <span className="font-semibold">
               ${payload[0].value.toLocaleString()}
             </span>
           </p>
           {milestone && (
-            <div className="mt-2 pt-2 border-t">
+            <div className="mt-2 pt-2 border-t border-white/10">
               <div className="flex items-center gap-1 text-sm font-medium">
                 {renderMilestoneIcon(milestone.icon)}
                 {milestone.label}
               </div>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-foreground/80 mt-1">
                 {milestone.description}
               </p>
             </div>
@@ -292,7 +292,10 @@ const MentalBankGrowth = ({
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         {filteredMilestones.map((milestone, index) => (
-          <Card key={index} className="overflow-hidden">
+          <Card
+            key={index}
+            className="overflow-hidden glass-card-inner border border-white/10"
+          >
             <div
               className={`h-1 ${milestone.type === "achievement" ? "bg-blue-500" : "bg-green-500"}`}
             />
@@ -312,10 +315,10 @@ const MentalBankGrowth = ({
                     : "Milestone"}
                 </Badge>
               </div>
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-foreground/80 mb-2">
                 {milestone.description}
               </p>
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-foreground/60">
                 <span>{format(parseISO(milestone.date), "MMM d, yyyy")}</span>
                 <span>${milestone.value.toLocaleString()}</span>
               </div>
@@ -328,7 +331,7 @@ const MentalBankGrowth = ({
 
   if (isLoading) {
     return (
-      <Card className="w-full bg-white shadow-sm">
+      <Card className="w-full glass-card shadow-sm border border-white/10">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
             Mental Bank Growth
@@ -336,9 +339,9 @@ const MentalBankGrowth = ({
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-            <div className="h-40 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-gray-700/30 rounded w-1/4"></div>
+            <div className="h-64 bg-gray-700/30 rounded"></div>
+            <div className="h-40 bg-gray-700/30 rounded"></div>
           </div>
         </CardContent>
       </Card>
@@ -348,7 +351,7 @@ const MentalBankGrowth = ({
   const filteredData = getFilteredData();
 
   return (
-    <Card className="w-full bg-white shadow-sm">
+    <Card className="w-full glass-card shadow-sm border border-white/10">
       <CardHeader>
         <CardTitle className="text-xl font-semibold">
           Mental Bank Growth
@@ -443,19 +446,19 @@ const MentalBankGrowth = ({
 
           {/* Tabs for different views */}
           <Tabs defaultValue="milestones">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 bg-transparent border border-white/10">
               <TabsTrigger value="milestones">
                 Milestones & Achievements
               </TabsTrigger>
               <TabsTrigger value="stats">Growth Statistics</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="milestones" className="pt-4">
+            <TabsContent value="milestones" className="pt-4 bg-transparent">
               {getFilteredMilestones().length > 0 ? (
                 renderMilestoneCards()
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Trophy className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <div className="text-center py-8 text-foreground/60 glass-card-inner rounded-lg border border-white/10">
+                  <Trophy className="h-12 w-12 mx-auto mb-3 text-foreground/30" />
                   <p>No milestones or achievements in this time period.</p>
                   <p className="text-sm">
                     Try selecting a different time range or complete more tasks
@@ -465,9 +468,9 @@ const MentalBankGrowth = ({
               )}
             </TabsContent>
 
-            <TabsContent value="stats" className="pt-4">
+            <TabsContent value="stats" className="pt-4 bg-transparent">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
+                <Card className="glass-card-inner border border-white/10">
                   <CardContent className="p-4">
                     <div className="text-sm text-muted-foreground">
                       Starting Balance
@@ -483,7 +486,7 @@ const MentalBankGrowth = ({
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="glass-card-inner border border-white/10">
                   <CardContent className="p-4">
                     <div className="text-sm text-muted-foreground">
                       Current Balance
@@ -507,7 +510,7 @@ const MentalBankGrowth = ({
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="glass-card-inner border border-white/10">
                   <CardContent className="p-4">
                     <div className="text-sm text-muted-foreground">Growth</div>
                     <div className="text-2xl font-bold text-green-600">
@@ -526,34 +529,34 @@ const MentalBankGrowth = ({
 
               <div className="mt-4">
                 <h3 className="text-lg font-medium mb-3">Growth Milestones</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <div className="overflow-x-auto glass-card-inner rounded-lg border border-white/10">
+                  <table className="min-w-full divide-y divide-white/10">
+                    <thead className="bg-transparent">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                           Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                           Balance
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                           Milestone
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                           Type
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-transparent divide-y divide-white/10">
                       {getFilteredMilestones().map((milestone, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <tr key={index} className="hover:bg-white/5">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/60">
                             {format(parseISO(milestone.date), "MMM d, yyyy")}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             ${milestone.value.toLocaleString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground/60">
                             <div className="flex items-center gap-2">
                               {renderMilestoneIcon(milestone.icon)}
                               {milestone.label}
