@@ -275,6 +275,7 @@ const TaskInsights = ({
     };
   };
 
+
   // Render productivity patterns chart
   const renderProductivityChart = () => {
     const data = getProductivityData();
@@ -321,6 +322,8 @@ const TaskInsights = ({
     );
   };
 
+
+  
   // Render value generation chart
   const renderValueGenerationChart = () => {
     const data = getValueGenerationData();
