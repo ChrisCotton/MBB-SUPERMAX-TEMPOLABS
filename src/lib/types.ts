@@ -14,6 +14,8 @@ export interface TimeEntry {
   duration: number; // Duration in seconds
 }
 
+export type TaskStatus = 'todo' | 'in-progress' | 'review' | 'completed';
+
 export interface Task {
   id: string;
   title: string;
@@ -21,11 +23,12 @@ export interface Task {
   category: string;
   hourlyRate: number;
   estimatedHours: number;
-  completed: boolean;
-  createdAt: string;
-  priority: "low" | "medium" | "high";
+  status: TaskStatus;
+  priority: 'high' | 'medium' | 'low';
   dueDate?: string;
+  createdAt: string;
   completedAt?: string;
+  completed: boolean;
   actualTimeSpent?: number; // Total time spent in hours
   inProgress?: boolean; // Indicates if the task is currently being timed
   timeEntries?: TimeEntry[];
