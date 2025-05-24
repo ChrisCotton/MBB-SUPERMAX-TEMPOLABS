@@ -16,10 +16,12 @@ import GoalDashboard from "./components/goals/GoalDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import JournalPage from "./pages/JournalPage";
 import { Toaster } from "./components/ui/toaster";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <>
+      <Navbar />
       {import.meta.env.VITE_TEMPO && useRoutes(routes)}
       <Routes>
         <Route
