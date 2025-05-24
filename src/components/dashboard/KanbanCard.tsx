@@ -1,5 +1,5 @@
 import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable } from '@hello-pangea/dnd';
 import { Task } from '@/lib/types';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';

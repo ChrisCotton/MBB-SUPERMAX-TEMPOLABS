@@ -1,5 +1,5 @@
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 import { Task, TaskStatus } from '@/lib/types';
 import { Card } from '../ui/card';
 import KanbanCard from './KanbanCard';

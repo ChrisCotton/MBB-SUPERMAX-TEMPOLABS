@@ -17,6 +17,7 @@ import ProfilePage from "./pages/ProfilePage";
 import JournalPage from "./pages/JournalPage";
 import { Toaster } from "./components/ui/toaster";
 import Navbar from "./components/Navbar";
+import KanbanBoard from "./components/dashboard/KanbanBoard";
 
 function App() {
   return (
@@ -49,6 +50,14 @@ function App() {
           element={
             <AuthWrapper>
               <CategoryManagement />
+            </AuthWrapper>
+          }
+        />
+        <Route
+          path="/kanban"
+          element={
+            <AuthWrapper>
+              <KanbanBoard />
             </AuthWrapper>
           }
         />

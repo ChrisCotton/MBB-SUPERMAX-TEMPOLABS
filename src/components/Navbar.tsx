@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const navLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/', label: 'Dashboard' },
   { to: '/categories', label: 'Categories' },
   { to: '/tasks', label: 'Tasks' },
   { to: '/kanban', label: 'Kanban Board' },
