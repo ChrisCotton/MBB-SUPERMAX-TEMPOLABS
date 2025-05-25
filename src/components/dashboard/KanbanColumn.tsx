@@ -10,9 +10,11 @@ interface KanbanColumnProps {
     title: string;
     tasks: Task[];
   };
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (taskId: string) => void;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ column }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ column, onEditTask, onDeleteTask }) => {
   return (
     <Card className="flex flex-col h-full bg-opacity-50 backdrop-blur-sm">
       <div className="p-4 border-b">
@@ -30,7 +32,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ column }) => {
             }`}
           >
             {column.tasks.map((task, index) => (
-              <KanbanCard key={task.id} task={task} index={index} />
+              <KanbanCard key={task.id} task={task} index={index} onEdit={onEditTask} onDelete={onDeleteTask} />
             ))}
             {provided.placeholder}
           </div>

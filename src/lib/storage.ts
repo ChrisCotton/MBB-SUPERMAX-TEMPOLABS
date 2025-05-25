@@ -29,6 +29,7 @@ const mapTaskFromDB = (dbTask: Tables<"tasks">): Task => ({
   inProgress: dbTask.in_progress,
   currentSessionStartTime: dbTask.current_session_start_time,
   priority: dbTask.priority || "medium",
+  status: dbTask.status || "todo",
 });
 
 const mapBalanceFromDB = (
@@ -288,6 +289,7 @@ export const addTask = async (
         hourly_rate: task.hourlyRate,
         estimated_hours: task.estimatedHours,
         completed: task.completed,
+        status: task.status,
         user_id: user.id,
       })
       .select()
@@ -367,6 +369,8 @@ export const updateTask = async (
       updateData.estimated_hours = taskData.estimatedHours;
     if (taskData.completed !== undefined)
       updateData.completed = taskData.completed;
+    if (taskData.priority !== undefined)
+      updateData.priority = taskData.priority;
 
     const { data, error } = await supabase
       .from("tasks")
