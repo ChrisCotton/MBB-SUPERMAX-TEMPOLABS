@@ -18,6 +18,7 @@ import JournalPage from "./pages/JournalPage";
 import { Toaster } from "./components/ui/toaster";
 import Navbar from "./components/Navbar";
 import KanbanBoard from "./components/dashboard/KanbanBoard";
+import ProgressCharts from "./components/dashboard/ProgressCharts";
 
 function App() {
   return (
@@ -58,6 +59,14 @@ function App() {
           element={
             <AuthWrapper>
               <KanbanBoard />
+            </AuthWrapper>
+          }
+        />
+        <Route
+          path="/charts"
+          element={
+            <AuthWrapper>
+              <ProgressCharts />
             </AuthWrapper>
           }
         />

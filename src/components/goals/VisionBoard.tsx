@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,20 +71,6 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const uploadImage = async () => {
     if (!selectedFile) return null;
 
@@ -94,7 +81,9 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
       const { data: user } = await supabase.auth.getUser();
       if (!user?.user) throw new Error("User not authenticated");
 
-      const fileExt = selectedFile.name.split(".").pop();
+      const fileExt = (selectedFile as File).name
+        ? (selectedFile as File).name.split(".").pop()
+        : "png";
       const fileName = `${user.user.id}-${Date.now()}.${fileExt}`;
       const filePath = `vision-boards/${fileName}`;
 
@@ -103,12 +92,6 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
         .upload(filePath, selectedFile, {
           cacheControl: "3600",
           upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = Math.round(
-              (progress.loaded / progress.total) * 100,
-            );
-            setUploadProgress(percent);
-          },
         });
 
       if (uploadError) throw uploadError;
@@ -241,6 +224,19 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
     setPreviewUrl(null);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="bg-transparent p-4 rounded-lg">
       <Card className="glass-card shadow-md border border-white/10">
@@ -325,9 +321,9 @@ export const VisionBoard = ({ boardId }: VisionBoardProps) => {
                           </span>
                           <input
                             type="file"
-                            className="hidden"
                             accept="image/*"
                             onChange={handleFileChange}
+                            className="hidden"
                           />
                         </label>
                       </div>

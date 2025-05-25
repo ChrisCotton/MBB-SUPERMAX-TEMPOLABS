@@ -130,8 +130,7 @@ const LoginForm = ({
             <Button
               type="button"
               variant="link"
-              className="text-primary hover:text-primary/80"
-              className="px-0 font-normal"
+              className="text-primary hover:text-primary/80 px-0 font-normal"
               onClick={onForgotPasswordClick}
               disabled={isLoading}
             >
