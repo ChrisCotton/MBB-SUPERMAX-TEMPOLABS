@@ -36,14 +36,21 @@ const KanbanBoard: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pendingDeleteTaskId, setPendingDeleteTaskId] = useState<string | null>(null);
 
-  // Move loadTasks to a top-level function so it can be reused
   const loadTasks = async () => {
     const loadedTasks = await getTasks();
     setTasks(loadedTasks);
-    // Distribute tasks into columns
-    const newColumns = columns.map(column => ({
-      ...column,
-      tasks: loadedTasks.filter(task => task.status === column.id)
+    // Always rebuild columns from canonical list
+    const columnOrder: TaskStatus[] = ['todo', 'in-progress', 'review', 'completed'];
+    const columnTitles: Record<TaskStatus, string> = {
+      'todo': 'To Do',
+      'in-progress': 'In Progress',
+      'review': 'Review',
+      'completed': 'Completed',
+    };
+    const newColumns = columnOrder.map(id => ({
+      id,
+      title: columnTitles[id],
+      tasks: loadedTasks.filter(task => task.status === id),
     }));
     setColumns(newColumns);
   };
@@ -113,12 +120,14 @@ const KanbanBoard: React.FC = () => {
   const handleUpdateTask = async (formData: any) => {
     if (!currentTask) return;
     try {
+      console.log('DEBUG: handleUpdateTask formData:', formData);
+      console.log('DEBUG: currentTask.status:', currentTask.status);
       await updateTask(currentTask.id, {
         ...formData,
         hourlyRate: parseFloat(formData.hourlyRate),
         estimatedHours: parseFloat(formData.estimatedHours),
         completed: formData.status === 'completed',
-        status: formData.status === 'completed' ? 'completed' : formData.status || currentTask.status,
+        status: formData.status ?? currentTask.status,
       });
       await loadTasks();
       setShowEditTaskDialog(false);

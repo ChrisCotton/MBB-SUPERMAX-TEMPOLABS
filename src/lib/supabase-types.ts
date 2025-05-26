@@ -41,34 +41,40 @@ export type Database = {
           completion_date: string | null
           created_at: string
           description: string | null
+          due_date: string | null
           goal_id: string
           id: string
           is_completed: boolean | null
           reward: string | null
           target_value: number
           title: string
+          user_id: string | null
         }
         Insert: {
           completion_date?: string | null
           created_at?: string
           description?: string | null
+          due_date?: string | null
           goal_id: string
           id?: string
           is_completed?: boolean | null
           reward?: string | null
           target_value: number
           title: string
+          user_id?: string | null
         }
         Update: {
           completion_date?: string | null
           created_at?: string
           description?: string | null
+          due_date?: string | null
           goal_id?: string
           id?: string
           is_completed?: boolean | null
           reward?: string | null
           target_value?: number
           title?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -291,6 +297,7 @@ export type Database = {
       tasks: {
         Row: {
           category_id: string
+          comments: string | null
           completed: boolean | null
           completed_at: string | null
           created_at: string | null
@@ -303,11 +310,13 @@ export type Database = {
           id: string
           in_progress: boolean | null
           priority: string | null
+          status: string | null
           title: string
           user_id: string
         }
         Insert: {
           category_id: string
+          comments?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
@@ -320,11 +329,13 @@ export type Database = {
           id?: string
           in_progress?: boolean | null
           priority?: string | null
+          status?: string | null
           title: string
           user_id: string
         }
         Update: {
           category_id?: string
+          comments?: string | null
           completed?: boolean | null
           completed_at?: string | null
           created_at?: string | null
@@ -337,6 +348,7 @@ export type Database = {
           id?: string
           in_progress?: boolean | null
           priority?: string | null
+          status?: string | null
           title?: string
           user_id?: string
         }

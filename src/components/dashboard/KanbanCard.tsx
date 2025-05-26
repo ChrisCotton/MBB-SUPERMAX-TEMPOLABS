@@ -4,6 +4,8 @@ import { Task } from '@/lib/types';
 import { Card } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Clock, Tag, Pencil, Trash2 } from 'lucide-react';
+import MarkdownPreview from '@uiw/react-markdown-preview';
+import '@uiw/react-markdown-preview/markdown.css';
 
 interface KanbanCardProps {
   task: Task;
@@ -78,6 +80,11 @@ const KanbanCard: React.FC<KanbanCardProps> = ({ task, index, onEdit, onDelete }
               )}
             </div>
           </div>
+          {task.comments && task.comments.trim() !== '' && (
+            <div className="mt-3 border-t pt-2 text-xs">
+              <MarkdownPreview source={task.comments} />
+            </div>
+          )}
         </Card>
       )}
     </Draggable>

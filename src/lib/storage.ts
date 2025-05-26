@@ -29,7 +29,8 @@ const mapTaskFromDB = (dbTask: Tables<"tasks">): Task => ({
   inProgress: dbTask.in_progress,
   currentSessionStartTime: dbTask.current_session_start_time,
   priority: dbTask.priority || "medium",
-  status: dbTask.status || "todo",
+  status: dbTask.status,
+  comments: dbTask.comments || "",
 });
 
 const mapBalanceFromDB = (
@@ -291,6 +292,7 @@ export const addTask = async (
         completed: task.completed,
         status: task.status,
         user_id: user.id,
+        comments: task.comments,
       })
       .select()
       .single();
@@ -371,6 +373,8 @@ export const updateTask = async (
       updateData.completed = taskData.completed;
     if (taskData.priority !== undefined)
       updateData.priority = taskData.priority;
+    if (taskData.comments !== undefined)
+      updateData.comments = taskData.comments;
 
     const { data, error } = await supabase
       .from("tasks")

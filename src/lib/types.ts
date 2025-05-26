@@ -23,7 +23,7 @@ export interface Task {
   category: string;
   hourlyRate: number;
   estimatedHours: number;
-  status: TaskStatus;
+  status: string;
   priority: 'high' | 'medium' | 'low';
   dueDate?: string;
   createdAt: string;
@@ -34,6 +34,7 @@ export interface Task {
   timeEntries?: TimeEntry[];
   currentSessionStartTime?: string; // ISO string of when the current timing session started
   dailyBalance?: number; // Daily accumulated mental bank balance for the task
+  comments?: string;
 }
 
 export interface User {

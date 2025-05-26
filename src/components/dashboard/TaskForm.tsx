@@ -28,6 +28,9 @@ import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -45,7 +48,8 @@ const formSchema = z.object({
     }),
   priority: z.enum(["low", "medium", "high"]),
   dueDate: z.date().optional(),
-  status: z.enum(["pending", "completed"]),
+  status: z.enum(["pending", "in-progress", "review", "completed"]),
+  comments: z.string().optional(),
 });
 
 interface TaskFormProps {
@@ -90,6 +94,7 @@ const TaskForm = ({
   const parsedInitialData = {
     ...initialData,
     dueDate: initialData.dueDate ? new Date(initialData.dueDate) : undefined,
+    comments: initialData.comments || "",
   };
 
   const form = useForm({
@@ -98,6 +103,7 @@ const TaskForm = ({
   });
 
   const handleSubmit = (data: any) => {
+    console.log('DEBUG: TaskForm handleSubmit data:', data);
     onSubmit(data);
   };
 
@@ -295,7 +301,7 @@ const TaskForm = ({
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
                   className="flex space-x-4"
                 >
                   <FormItem className="flex items-center space-x-2 space-y-0">
@@ -308,6 +314,22 @@ const TaskForm = ({
                   </FormItem>
                   <FormItem className="flex items-center space-x-2 space-y-0">
                     <FormControl>
+                      <RadioGroupItem value="in-progress" />
+                    </FormControl>
+                    <FormLabel className="font-normal text-muted-foreground">
+                      In Progress
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="review" />
+                    </FormControl>
+                    <FormLabel className="font-normal text-muted-foreground">
+                      Review
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
                       <RadioGroupItem value="completed" />
                     </FormControl>
                     <FormLabel className="font-normal text-muted-foreground">
@@ -316,6 +338,30 @@ const TaskForm = ({
                   </FormItem>
                 </RadioGroup>
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="comments"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Comments</FormLabel>
+              <FormControl>
+                <div data-color-mode="light">
+                  <MDEditor
+                    value={field.value}
+                    onChange={field.onChange}
+                    height={150}
+                    textareaProps={{ placeholder: "Add comments in markdown..." }}
+                  />
+                </div>
+              </FormControl>
+              <FormDescription>
+                You can use markdown to format your comments.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
